@@ -33,10 +33,11 @@ def plot_results(
 
     #plt.ion()
     #plt.clf()
-    ax = fig.add_subplot(2, 3, 1)
-    ax.imshow(rgb_img)
-    ax.set_title('RGB')
-    ax.axis('off')
+    if rgb_img is not None:
+        ax = fig.add_subplot(2, 3, 1)
+        ax.imshow(rgb_img)
+        ax.set_title('RGB')
+        ax.axis('off')
 
     if depth_img is not None:
         ax = fig.add_subplot(2, 3, 2)
@@ -44,8 +45,8 @@ def plot_results(
         ax.set_title('Depth')
         ax.axis('off')
 
-    ax = fig.add_subplot(2, 3, 3)
-    ax.imshow(rgb_img)
+    # ax = fig.add_subplot(2, 3, 3)
+    # ax.imshow(rgb_img)
 
     # color_list = ['r', 'b', 'g', 'y', 'y', 'y', 'y', 'y']
     # grasp_list = ['best', 'second', 'third', 'rest']

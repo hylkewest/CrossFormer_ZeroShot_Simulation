@@ -24,6 +24,11 @@ class GrasppingScenarios():
             self.IMG_SIZE = 224
             self.network_path = 'trained_models/GR_ConvNet/cornell-randsplit-rgbd-grconvnet3-drop1-ch32/epoch_19_iou_0.98'
             sys.path.append('trained_models/GR_ConvNet')
+        elif (network_model == "GGCNN"):
+            ##### GGCNN #####
+            self.IMG_SIZE = 300
+            self.network_path = 'trained_models/GGCNN/ggcnn_weights_cornell/ggcnn_epoch_23_cornell'
+            sys.path.append('trained_models/GGCNN')
         else:
             # you need to add your network here!
             print("The selected network has not been implemented yet!")
@@ -339,8 +344,9 @@ class GrasppingScenarios():
 
                         #env.reset_all_obj()
         
-                except:
+                except Exception as e:
                     print("An exception occurred during the experiment!!!")
+                    print(e)
                     env.reset_robot()
                     #print ("#objects = ", len(env.obj_ids), "#failed = ", number_of_failures , "#attempts =", number_of_attempts)
         

@@ -284,8 +284,12 @@ def write_summary(path, tries, target, grasp):
             n_tries = tries[obj]
             n_t = target[obj]
             n_g = grasp[obj]
-            f.write(
-                f'{obj}: Grasp acc={n_g/n_tries:.3f} ({n_g}/{n_tries}) --- Manipulation acc={n_t/n_tries:.3f} ({n_t}/{n_tries}) \n')
+            if n_tries == 0:
+                f.write(
+                    f'{obj}: Grasp acc=0.000 (0/0) --- Manipulation acc=0.000 (0/0) \n')
+            else:   
+                f.write(
+                    f'{obj}: Grasp acc={n_g/n_tries:.3f} ({n_g}/{n_tries}) --- Manipulation acc={n_t/n_tries:.3f} ({n_t}/{n_tries}) \n')
 
 
 def summarize(path, trials,modelname):

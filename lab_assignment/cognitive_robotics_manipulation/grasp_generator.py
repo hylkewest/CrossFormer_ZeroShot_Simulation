@@ -139,15 +139,18 @@ class GraspGenerator:
             depth = np.expand_dims(np.array(depth), axis=2)
             img_data = CameraData(width=self.IMG_WIDTH, height=self.IMG_WIDTH)
             x, depth_img, rgb_img = img_data.get_data(rgb=rgb, depth=depth)
+        elif self.network == 'GGCNN':
+            ##### GGCNN #####
+            depth = np.expand_dims(np.array(depth), axis=2)
+            depth_img = torch.tensor(depth, dtype=torch.float32).permute(2, 0, 1).unsqueeze(0).to(self.device)
         else:
             print("The selected network has not been implemented yet -- please choose another network!")
             exit() 
 
         with torch.no_grad():
-            xc = x.to(self.device)
-
             if (self.network == 'GR_ConvNet'):
                 ##### GR-ConvNet #####
+                xc = x.to(self.device)
                 pred = self.net.predict(xc)
                 # print (pred)
                 pixels_max_grasp = int(self.MAX_GRASP * self.PIX_CONVERSION)
@@ -156,13 +159,17 @@ class GraspGenerator:
                                                                 pred['sin'],
                                                                 pred['width'],
                                                                 pixels_max_grasp)
+            elif self.network == 'GGCNN':
+                pred = self.net(depth_img)
+                q_img, ang_img, width_img = self.post_process_output(
+                    pred[0], pred[1], pred[2], pred[3], int(self.MAX_GRASP * self.PIX_CONVERSION))
             else: 
                 print ("you need to add your function here!")        
         
         save_name = None
         if show_output:
             #fig = plt.figure(figsize=(10, 10))
-            im_bgr = cv2.cvtColor(rgb, cv2.COLOR_RGB2BGR)
+            im_bgr = cv2.cvtColor(rgb, cv2.COLOR_RGB2BGR) if rgb is not None else None
             plot = plot_results(self.fig,
                                 rgb_img=im_bgr,
                                 grasp_q_img=q_img,
@@ -182,10 +189,18 @@ class GraspGenerator:
         return grasps, save_name
 
     def predict_grasp(self, rgb, depth, n_grasps=1, show_output=False):
-        predictions, save_name = self.predict(rgb, depth, n_grasps=n_grasps, show_output=show_output)
+        # Pass only the required data based on the network type
+        if self.network == 'GGCNN':
+            # GGCNN uses depth-only data
+            predictions, save_name = self.predict(None, depth, n_grasps=n_grasps, show_output=show_output)
+        else:
+            # GR_ConvNet uses both RGB and depth
+            predictions, save_name = self.predict(rgb, depth, n_grasps=n_grasps, show_output=show_output)
+
         grasps = []
         for grasp in predictions:
             x, y, z, roll, opening_len, obj_height = self.grasp_to_robot_frame(grasp, depth)
             grasps.append((x, y, z, roll, opening_len, obj_height))
 
         return grasps, save_name
+
