@@ -1,0 +1,1886 @@
+{
+    "dataset_kwargs": {
+        "balance_weights": false,
+        "batch_size": 8,
+        "dataset_kwargs_list": [
+            {
+                "name": "kuka",
+                "data_dir": null,
+                "image_obs_keys": {
+                    "primary": "image",
+                    "high": null,
+                    "nav": null,
+                    "left_wrist": null,
+                    "right_wrist": null
+                },
+                "proprio_obs_keys": {
+                    "bimanual": null,
+                    "quadruped": null
+                },
+                "proprio_obs_dims": {
+                    "bimanual": 14,
+                    "quadruped": 59
+                },
+                "action_normalization_mask": [
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    false
+                ],
+                "language_key": "language_instruction",
+                "action_proprio_normalization_type": "normal",
+                "standardize_fn": {
+                    "module": "crossformer.data.oxe.oxe_standardization_transforms",
+                    "name": "kuka_dataset_transform",
+                    "args": [],
+                    "kwargs": {}
+                }
+            },
+            {
+                "name": "taco_play",
+                "data_dir": null,
+                "image_obs_keys": {
+                    "primary": "rgb_static",
+                    "high": null,
+                    "nav": null,
+                    "left_wrist": null,
+                    "right_wrist": null
+                },
+                "proprio_obs_keys": {
+                    "bimanual": null,
+                    "quadruped": null
+                },
+                "proprio_obs_dims": {
+                    "bimanual": 14,
+                    "quadruped": 59
+                },
+                "action_normalization_mask": [
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    false
+                ],
+                "language_key": "language_instruction",
+                "action_proprio_normalization_type": "normal",
+                "standardize_fn": {
+                    "module": "crossformer.data.oxe.oxe_standardization_transforms",
+                    "name": "taco_dataset_transform",
+                    "args": [],
+                    "kwargs": {}
+                }
+            },
+            {
+                "name": "taco_extra",
+                "data_dir": null,
+                "image_obs_keys": {
+                    "primary": "rgb_static",
+                    "high": null,
+                    "nav": null,
+                    "left_wrist": null,
+                    "right_wrist": null
+                },
+                "proprio_obs_keys": {
+                    "bimanual": null,
+                    "quadruped": null
+                },
+                "proprio_obs_dims": {
+                    "bimanual": 14,
+                    "quadruped": 59
+                },
+                "action_normalization_mask": [
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    false
+                ],
+                "language_key": "language_instruction",
+                "action_proprio_normalization_type": "normal",
+                "standardize_fn": {
+                    "module": "crossformer.data.oxe.oxe_standardization_transforms",
+                    "name": "taco_dataset_transform",
+                    "args": [],
+                    "kwargs": {}
+                }
+            },
+            {
+                "name": "jaco_play",
+                "data_dir": null,
+                "image_obs_keys": {
+                    "primary": "image",
+                    "high": null,
+                    "nav": null,
+                    "left_wrist": null,
+                    "right_wrist": null
+                },
+                "proprio_obs_keys": {
+                    "bimanual": null,
+                    "quadruped": null
+                },
+                "proprio_obs_dims": {
+                    "bimanual": 14,
+                    "quadruped": 59
+                },
+                "action_normalization_mask": [
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    false
+                ],
+                "language_key": "language_instruction",
+                "action_proprio_normalization_type": "normal",
+                "standardize_fn": {
+                    "module": "crossformer.data.oxe.oxe_standardization_transforms",
+                    "name": "jaco_play_dataset_transform",
+                    "args": [],
+                    "kwargs": {}
+                }
+            },
+            {
+                "name": "berkeley_cable_routing",
+                "data_dir": null,
+                "image_obs_keys": {
+                    "primary": "image",
+                    "high": null,
+                    "nav": null,
+                    "left_wrist": null,
+                    "right_wrist": null
+                },
+                "proprio_obs_keys": {
+                    "bimanual": null,
+                    "quadruped": null
+                },
+                "proprio_obs_dims": {
+                    "bimanual": 14,
+                    "quadruped": 59
+                },
+                "action_normalization_mask": [
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    false
+                ],
+                "language_key": "language_instruction",
+                "action_proprio_normalization_type": "normal",
+                "standardize_fn": {
+                    "module": "crossformer.data.oxe.oxe_standardization_transforms",
+                    "name": "berkeley_cable_routing_dataset_transform",
+                    "args": [],
+                    "kwargs": {}
+                }
+            },
+            {
+                "name": "roboturk",
+                "data_dir": null,
+                "image_obs_keys": {
+                    "primary": "front_rgb",
+                    "high": null,
+                    "nav": null,
+                    "left_wrist": null,
+                    "right_wrist": null
+                },
+                "proprio_obs_keys": {
+                    "bimanual": null,
+                    "quadruped": null
+                },
+                "proprio_obs_dims": {
+                    "bimanual": 14,
+                    "quadruped": 59
+                },
+                "action_normalization_mask": [
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    false
+                ],
+                "language_key": "language_instruction",
+                "action_proprio_normalization_type": "normal",
+                "standardize_fn": {
+                    "module": "crossformer.data.oxe.oxe_standardization_transforms",
+                    "name": "roboturk_dataset_transform",
+                    "args": [],
+                    "kwargs": {}
+                }
+            },
+            {
+                "name": "viola",
+                "data_dir": null,
+                "image_obs_keys": {
+                    "primary": "agentview_rgb",
+                    "high": null,
+                    "nav": null,
+                    "left_wrist": null,
+                    "right_wrist": null
+                },
+                "proprio_obs_keys": {
+                    "bimanual": null,
+                    "quadruped": null
+                },
+                "proprio_obs_dims": {
+                    "bimanual": 14,
+                    "quadruped": 59
+                },
+                "action_normalization_mask": [
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    false
+                ],
+                "language_key": "language_instruction",
+                "action_proprio_normalization_type": "normal",
+                "standardize_fn": {
+                    "module": "crossformer.data.oxe.oxe_standardization_transforms",
+                    "name": "viola_dataset_transform",
+                    "args": [],
+                    "kwargs": {}
+                }
+            },
+            {
+                "name": "berkeley_autolab_ur5",
+                "data_dir": null,
+                "image_obs_keys": {
+                    "primary": "image",
+                    "high": null,
+                    "nav": null,
+                    "left_wrist": null,
+                    "right_wrist": null
+                },
+                "proprio_obs_keys": {
+                    "bimanual": null,
+                    "quadruped": null
+                },
+                "proprio_obs_dims": {
+                    "bimanual": 14,
+                    "quadruped": 59
+                },
+                "action_normalization_mask": [
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    false
+                ],
+                "language_key": "language_instruction",
+                "action_proprio_normalization_type": "normal",
+                "standardize_fn": {
+                    "module": "crossformer.data.oxe.oxe_standardization_transforms",
+                    "name": "berkeley_autolab_ur5_dataset_transform",
+                    "args": [],
+                    "kwargs": {}
+                }
+            },
+            {
+                "name": "toto",
+                "data_dir": null,
+                "image_obs_keys": {
+                    "primary": "image",
+                    "high": null,
+                    "nav": null,
+                    "left_wrist": null,
+                    "right_wrist": null
+                },
+                "proprio_obs_keys": {
+                    "bimanual": null,
+                    "quadruped": null
+                },
+                "proprio_obs_dims": {
+                    "bimanual": 14,
+                    "quadruped": 59
+                },
+                "action_normalization_mask": [
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    false
+                ],
+                "language_key": "language_instruction",
+                "action_proprio_normalization_type": "normal",
+                "standardize_fn": {
+                    "module": "crossformer.data.oxe.oxe_standardization_transforms",
+                    "name": "toto_dataset_transform",
+                    "args": [],
+                    "kwargs": {}
+                }
+            },
+            {
+                "name": "language_table",
+                "data_dir": null,
+                "image_obs_keys": {
+                    "primary": "rgb",
+                    "high": null,
+                    "nav": null,
+                    "left_wrist": null,
+                    "right_wrist": null
+                },
+                "proprio_obs_keys": {
+                    "bimanual": null,
+                    "quadruped": null
+                },
+                "proprio_obs_dims": {
+                    "bimanual": 14,
+                    "quadruped": 59
+                },
+                "action_normalization_mask": [
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    false
+                ],
+                "language_key": "language_instruction",
+                "action_proprio_normalization_type": "normal",
+                "standardize_fn": {
+                    "module": "crossformer.data.oxe.oxe_standardization_transforms",
+                    "name": "language_table_dataset_transform",
+                    "args": [],
+                    "kwargs": {}
+                }
+            },
+            {
+                "name": "stanford_hydra_dataset_converted_externally_to_rlds",
+                "data_dir": null,
+                "image_obs_keys": {
+                    "primary": "image",
+                    "high": null,
+                    "nav": null,
+                    "left_wrist": null,
+                    "right_wrist": null
+                },
+                "proprio_obs_keys": {
+                    "bimanual": null,
+                    "quadruped": null
+                },
+                "proprio_obs_dims": {
+                    "bimanual": 14,
+                    "quadruped": 59
+                },
+                "action_normalization_mask": [
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    false
+                ],
+                "language_key": "language_instruction",
+                "action_proprio_normalization_type": "normal",
+                "standardize_fn": {
+                    "module": "crossformer.data.oxe.oxe_standardization_transforms",
+                    "name": "stanford_hydra_dataset_transform",
+                    "args": [],
+                    "kwargs": {}
+                }
+            },
+            {
+                "name": "austin_buds_dataset_converted_externally_to_rlds",
+                "data_dir": null,
+                "image_obs_keys": {
+                    "primary": "image",
+                    "high": null,
+                    "nav": null,
+                    "left_wrist": null,
+                    "right_wrist": null
+                },
+                "proprio_obs_keys": {
+                    "bimanual": null,
+                    "quadruped": null
+                },
+                "proprio_obs_dims": {
+                    "bimanual": 14,
+                    "quadruped": 59
+                },
+                "action_normalization_mask": [
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    false
+                ],
+                "language_key": "language_instruction",
+                "action_proprio_normalization_type": "normal",
+                "standardize_fn": {
+                    "module": "crossformer.data.oxe.oxe_standardization_transforms",
+                    "name": "austin_buds_dataset_transform",
+                    "args": [],
+                    "kwargs": {}
+                }
+            },
+            {
+                "name": "nyu_franka_play_dataset_converted_externally_to_rlds",
+                "data_dir": null,
+                "image_obs_keys": {
+                    "primary": "image",
+                    "high": null,
+                    "nav": null,
+                    "left_wrist": null,
+                    "right_wrist": null
+                },
+                "proprio_obs_keys": {
+                    "bimanual": null,
+                    "quadruped": null
+                },
+                "proprio_obs_dims": {
+                    "bimanual": 14,
+                    "quadruped": 59
+                },
+                "action_normalization_mask": [
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    false
+                ],
+                "language_key": "language_instruction",
+                "action_proprio_normalization_type": "normal",
+                "standardize_fn": {
+                    "module": "crossformer.data.oxe.oxe_standardization_transforms",
+                    "name": "nyu_franka_play_dataset_transform",
+                    "args": [],
+                    "kwargs": {}
+                }
+            },
+            {
+                "name": "furniture_bench_dataset_converted_externally_to_rlds",
+                "data_dir": null,
+                "image_obs_keys": {
+                    "primary": "image",
+                    "high": null,
+                    "nav": null,
+                    "left_wrist": null,
+                    "right_wrist": null
+                },
+                "proprio_obs_keys": {
+                    "bimanual": null,
+                    "quadruped": null
+                },
+                "proprio_obs_dims": {
+                    "bimanual": 14,
+                    "quadruped": 59
+                },
+                "action_normalization_mask": [
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    false
+                ],
+                "language_key": "language_instruction",
+                "action_proprio_normalization_type": "normal",
+                "standardize_fn": {
+                    "module": "crossformer.data.oxe.oxe_standardization_transforms",
+                    "name": "furniture_bench_dataset_transform",
+                    "args": [],
+                    "kwargs": {}
+                }
+            },
+            {
+                "name": "austin_sailor_dataset_converted_externally_to_rlds",
+                "data_dir": null,
+                "image_obs_keys": {
+                    "primary": "image",
+                    "nav": null,
+                    "high": null,
+                    "left_wrist": null,
+                    "right_wrist": null
+                },
+                "proprio_obs_keys": {
+                    "bimanual": null,
+                    "quadruped": null
+                },
+                "proprio_obs_dims": {
+                    "bimanual": 14,
+                    "quadruped": 59
+                },
+                "action_normalization_mask": [
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    false
+                ],
+                "language_key": "language_instruction",
+                "action_proprio_normalization_type": "normal",
+                "standardize_fn": {
+                    "module": "crossformer.data.oxe.oxe_standardization_transforms",
+                    "name": "austin_sailor_dataset_transform",
+                    "args": [],
+                    "kwargs": {}
+                }
+            },
+            {
+                "name": "austin_sirius_dataset_converted_externally_to_rlds",
+                "data_dir": null,
+                "image_obs_keys": {
+                    "primary": "image",
+                    "nav": null,
+                    "high": null,
+                    "left_wrist": null,
+                    "right_wrist": null
+                },
+                "proprio_obs_keys": {
+                    "bimanual": null,
+                    "quadruped": null
+                },
+                "proprio_obs_dims": {
+                    "bimanual": 14,
+                    "quadruped": 59
+                },
+                "action_normalization_mask": [
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    false
+                ],
+                "language_key": "language_instruction",
+                "action_proprio_normalization_type": "normal",
+                "standardize_fn": {
+                    "module": "crossformer.data.oxe.oxe_standardization_transforms",
+                    "name": "austin_sirius_dataset_transform",
+                    "args": [],
+                    "kwargs": {}
+                }
+            },
+            {
+                "name": "bc_z",
+                "data_dir": null,
+                "image_obs_keys": {
+                    "primary": "image",
+                    "high": null,
+                    "nav": null,
+                    "left_wrist": null,
+                    "right_wrist": null
+                },
+                "proprio_obs_keys": {
+                    "bimanual": null,
+                    "quadruped": null
+                },
+                "proprio_obs_dims": {
+                    "bimanual": 14,
+                    "quadruped": 59
+                },
+                "action_normalization_mask": [
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    false
+                ],
+                "language_key": "language_instruction",
+                "action_proprio_normalization_type": "normal",
+                "standardize_fn": {
+                    "module": "crossformer.data.oxe.oxe_standardization_transforms",
+                    "name": "bc_z_dataset_transform",
+                    "args": [],
+                    "kwargs": {}
+                }
+            },
+            {
+                "name": "dlr_edan_shared_control_converted_externally_to_rlds",
+                "data_dir": null,
+                "image_obs_keys": {
+                    "primary": "image",
+                    "high": null,
+                    "nav": null,
+                    "left_wrist": null,
+                    "right_wrist": null
+                },
+                "proprio_obs_keys": {
+                    "bimanual": null,
+                    "quadruped": null
+                },
+                "proprio_obs_dims": {
+                    "bimanual": 14,
+                    "quadruped": 59
+                },
+                "action_normalization_mask": [
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    false
+                ],
+                "language_key": "language_instruction",
+                "action_proprio_normalization_type": "normal",
+                "standardize_fn": {
+                    "module": "crossformer.data.oxe.oxe_standardization_transforms",
+                    "name": "dlr_edan_shared_control_dataset_transform",
+                    "args": [],
+                    "kwargs": {}
+                }
+            },
+            {
+                "name": "iamlab_cmu_pickup_insert_converted_externally_to_rlds",
+                "data_dir": null,
+                "image_obs_keys": {
+                    "primary": "image",
+                    "high": null,
+                    "nav": null,
+                    "left_wrist": null,
+                    "right_wrist": null
+                },
+                "proprio_obs_keys": {
+                    "bimanual": null,
+                    "quadruped": null
+                },
+                "proprio_obs_dims": {
+                    "bimanual": 14,
+                    "quadruped": 59
+                },
+                "action_normalization_mask": [
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    false
+                ],
+                "language_key": "language_instruction",
+                "action_proprio_normalization_type": "normal",
+                "standardize_fn": {
+                    "module": "crossformer.data.oxe.oxe_standardization_transforms",
+                    "name": "iamlab_pick_insert_dataset_transform",
+                    "args": [],
+                    "kwargs": {}
+                }
+            },
+            {
+                "name": "utaustin_mutex",
+                "data_dir": null,
+                "image_obs_keys": {
+                    "primary": "image",
+                    "high": null,
+                    "nav": null,
+                    "left_wrist": null,
+                    "right_wrist": null
+                },
+                "proprio_obs_keys": {
+                    "bimanual": null,
+                    "quadruped": null
+                },
+                "proprio_obs_dims": {
+                    "bimanual": 14,
+                    "quadruped": 59
+                },
+                "action_normalization_mask": [
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    false
+                ],
+                "language_key": "language_instruction",
+                "action_proprio_normalization_type": "normal",
+                "standardize_fn": {
+                    "module": "crossformer.data.oxe.oxe_standardization_transforms",
+                    "name": "utaustin_mutex_dataset_transform",
+                    "args": [],
+                    "kwargs": {}
+                }
+            },
+            {
+                "name": "berkeley_fanuc_manipulation",
+                "data_dir": null,
+                "image_obs_keys": {
+                    "primary": "image",
+                    "high": null,
+                    "nav": null,
+                    "left_wrist": null,
+                    "right_wrist": null
+                },
+                "proprio_obs_keys": {
+                    "bimanual": null,
+                    "quadruped": null
+                },
+                "proprio_obs_dims": {
+                    "bimanual": 14,
+                    "quadruped": 59
+                },
+                "action_normalization_mask": [
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    false
+                ],
+                "language_key": "language_instruction",
+                "action_proprio_normalization_type": "normal",
+                "standardize_fn": {
+                    "module": "crossformer.data.oxe.oxe_standardization_transforms",
+                    "name": "berkeley_fanuc_dataset_transform",
+                    "args": [],
+                    "kwargs": {}
+                }
+            },
+            {
+                "name": "cmu_stretch",
+                "data_dir": null,
+                "image_obs_keys": {
+                    "primary": "image",
+                    "high": null,
+                    "nav": null,
+                    "left_wrist": null,
+                    "right_wrist": null
+                },
+                "proprio_obs_keys": {
+                    "bimanual": null,
+                    "quadruped": null
+                },
+                "proprio_obs_dims": {
+                    "bimanual": 14,
+                    "quadruped": 59
+                },
+                "action_normalization_mask": [
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    false
+                ],
+                "language_key": "language_instruction",
+                "action_proprio_normalization_type": "normal",
+                "standardize_fn": {
+                    "module": "crossformer.data.oxe.oxe_standardization_transforms",
+                    "name": "cmu_stretch_dataset_transform",
+                    "args": [],
+                    "kwargs": {}
+                }
+            },
+            {
+                "name": "droid",
+                "data_dir": null,
+                "image_obs_keys": {
+                    "primary": "exterior_image_1_left",
+                    "high": null,
+                    "nav": null,
+                    "left_wrist": null,
+                    "right_wrist": null
+                },
+                "proprio_obs_keys": {
+                    "bimanual": null,
+                    "quadruped": null
+                },
+                "proprio_obs_dims": {
+                    "bimanual": 14,
+                    "quadruped": 59
+                },
+                "filter_functions": [
+                    {
+                        "module": "experiments.homer.scripts.configs.cross_embodiment",
+                        "name": "filter_success",
+                        "args": [],
+                        "kwargs": {}
+                    }
+                ],
+                "action_normalization_mask": [
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    false
+                ],
+                "language_key": "language_instruction",
+                "action_proprio_normalization_type": "normal",
+                "standardize_fn": {
+                    "module": "crossformer.data.oxe.oxe_standardization_transforms",
+                    "name": "droid_dataset_transform",
+                    "args": [],
+                    "kwargs": {}
+                }
+            },
+            {
+                "name": "aloha_pen_uncap_diverse_dataset",
+                "data_dir": null,
+                "image_obs_keys": {
+                    "primary": null,
+                    "high": "cam_high",
+                    "nav": null,
+                    "left_wrist": "cam_left_wrist",
+                    "right_wrist": "cam_right_wrist"
+                },
+                "proprio_obs_keys": {
+                    "bimanual": "proprio",
+                    "quadruped": null
+                },
+                "proprio_obs_dims": {
+                    "bimanual": 14,
+                    "quadruped": 59
+                },
+                "action_normalization_mask": [
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    false,
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    false
+                ],
+                "language_key": "language_instruction",
+                "action_proprio_normalization_type": "normal",
+                "standardize_fn": {
+                    "module": "crossformer.data.oxe.oxe_standardization_transforms",
+                    "name": "aloha_pen_uncap_dataset_transform",
+                    "args": [],
+                    "kwargs": {}
+                }
+            },
+            {
+                "name": "aloha_dough_cut_dataset",
+                "data_dir": null,
+                "image_obs_keys": {
+                    "primary": null,
+                    "high": "cam_high",
+                    "nav": null,
+                    "left_wrist": "cam_left_wrist",
+                    "right_wrist": "cam_right_wrist"
+                },
+                "proprio_obs_keys": {
+                    "bimanual": "proprio",
+                    "quadruped": null
+                },
+                "proprio_obs_dims": {
+                    "bimanual": 14,
+                    "quadruped": 59
+                },
+                "action_normalization_mask": [
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    false,
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    false
+                ],
+                "language_key": "language_instruction",
+                "action_proprio_normalization_type": "normal",
+                "standardize_fn": {
+                    "module": "crossformer.data.oxe.oxe_standardization_transforms",
+                    "name": "aloha_dough_dataset_transform",
+                    "args": [],
+                    "kwargs": {}
+                }
+            },
+            {
+                "name": "aloha_lucy_dataset",
+                "data_dir": null,
+                "image_obs_keys": {
+                    "primary": null,
+                    "high": "cam_high",
+                    "nav": null,
+                    "left_wrist": "cam_left_wrist",
+                    "right_wrist": "cam_right_wrist"
+                },
+                "proprio_obs_keys": {
+                    "bimanual": "proprio",
+                    "quadruped": null
+                },
+                "proprio_obs_dims": {
+                    "bimanual": 14,
+                    "quadruped": 59
+                },
+                "action_normalization_mask": [
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    false,
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    false
+                ],
+                "language_key": "language_instruction",
+                "action_proprio_normalization_type": "normal",
+                "standardize_fn": {
+                    "module": "crossformer.data.oxe.oxe_standardization_transforms",
+                    "name": "aloha_dough_dataset_transform",
+                    "args": [],
+                    "kwargs": {}
+                }
+            },
+            {
+                "name": "aloha_drawer_dataset",
+                "data_dir": null,
+                "image_obs_keys": {
+                    "primary": null,
+                    "high": "cam_high",
+                    "nav": null,
+                    "left_wrist": "cam_left_wrist",
+                    "right_wrist": "cam_right_wrist"
+                },
+                "proprio_obs_keys": {
+                    "bimanual": "proprio",
+                    "quadruped": null
+                },
+                "proprio_obs_dims": {
+                    "bimanual": 14,
+                    "quadruped": 59
+                },
+                "action_normalization_mask": [
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    false,
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    false
+                ],
+                "language_key": "language_instruction",
+                "action_proprio_normalization_type": "normal",
+                "standardize_fn": {
+                    "module": "crossformer.data.oxe.oxe_standardization_transforms",
+                    "name": "aloha_dough_dataset_transform",
+                    "args": [],
+                    "kwargs": {}
+                }
+            },
+            {
+                "name": "aloha_pick_place_dataset",
+                "data_dir": null,
+                "image_obs_keys": {
+                    "primary": null,
+                    "high": "cam_high",
+                    "nav": null,
+                    "left_wrist": "cam_left_wrist",
+                    "right_wrist": "cam_right_wrist"
+                },
+                "proprio_obs_keys": {
+                    "bimanual": "proprio",
+                    "quadruped": null
+                },
+                "proprio_obs_dims": {
+                    "bimanual": 14,
+                    "quadruped": 59
+                },
+                "action_normalization_mask": [
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    false,
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    false
+                ],
+                "language_key": "language_instruction",
+                "action_proprio_normalization_type": "normal",
+                "standardize_fn": {
+                    "module": "crossformer.data.oxe.oxe_standardization_transforms",
+                    "name": "aloha_dough_dataset_transform",
+                    "args": [],
+                    "kwargs": {}
+                }
+            },
+            {
+                "name": "aloha_static_dataset",
+                "data_dir": null,
+                "image_obs_keys": {
+                    "primary": null,
+                    "high": "cam_high",
+                    "nav": null,
+                    "left_wrist": "cam_left_wrist",
+                    "right_wrist": "cam_right_wrist"
+                },
+                "proprio_obs_keys": {
+                    "bimanual": "proprio",
+                    "quadruped": null
+                },
+                "proprio_obs_dims": {
+                    "bimanual": 14,
+                    "quadruped": 59
+                },
+                "action_normalization_mask": [
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    false,
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    false
+                ],
+                "language_key": "language_instruction",
+                "action_proprio_normalization_type": "normal",
+                "standardize_fn": {
+                    "module": "crossformer.data.oxe.oxe_standardization_transforms",
+                    "name": "aloha_dough_dataset_transform",
+                    "args": [],
+                    "kwargs": {}
+                }
+            },
+            {
+                "name": "aloha_sushi_cut_full_dataset",
+                "data_dir": null,
+                "image_obs_keys": {
+                    "primary": null,
+                    "high": "cam_high",
+                    "nav": null,
+                    "left_wrist": "cam_left_wrist",
+                    "right_wrist": "cam_right_wrist"
+                },
+                "proprio_obs_keys": {
+                    "bimanual": "proprio",
+                    "quadruped": null
+                },
+                "proprio_obs_dims": {
+                    "bimanual": 14,
+                    "quadruped": 59
+                },
+                "action_normalization_mask": [
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    false,
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    false
+                ],
+                "language_key": "language_instruction",
+                "action_proprio_normalization_type": "normal",
+                "standardize_fn": {
+                    "module": "crossformer.data.oxe.oxe_standardization_transforms",
+                    "name": "aloha_dough_dataset_transform",
+                    "args": [],
+                    "kwargs": {}
+                }
+            },
+            {
+                "name": "bridge_dataset",
+                "data_dir": null,
+                "image_obs_keys": {
+                    "primary": "image_0",
+                    "high": null,
+                    "nav": null,
+                    "left_wrist": null,
+                    "right_wrist": null
+                },
+                "proprio_obs_keys": {
+                    "bimanual": null,
+                    "quadruped": null
+                },
+                "proprio_obs_dims": {
+                    "bimanual": 14,
+                    "quadruped": 59
+                },
+                "action_normalization_mask": [
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    false
+                ],
+                "language_key": "language_instruction",
+                "action_proprio_normalization_type": "normal",
+                "standardize_fn": {
+                    "module": "crossformer.data.oxe.oxe_standardization_transforms",
+                    "name": "bridge_dataset_transform",
+                    "args": [],
+                    "kwargs": {}
+                }
+            },
+            {
+                "name": "go1",
+                "data_dir": null,
+                "image_obs_keys": {
+                    "primary": null,
+                    "high": null,
+                    "nav": null,
+                    "left_wrist": null,
+                    "right_wrist": null
+                },
+                "proprio_obs_keys": {
+                    "bimanual": null,
+                    "quadruped": "proprio"
+                },
+                "proprio_obs_dims": {
+                    "bimanual": 14,
+                    "quadruped": 59
+                },
+                "action_normalization_mask": [
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    true
+                ],
+                "language_key": "language_instruction",
+                "action_proprio_normalization_type": "normal",
+                "standardize_fn": {
+                    "module": "crossformer.data.oxe.oxe_standardization_transforms",
+                    "name": "go1_dataset_transform",
+                    "args": [],
+                    "kwargs": {}
+                }
+            },
+            {
+                "name": "droid_wipe",
+                "data_dir": null,
+                "image_obs_keys": {
+                    "primary": "exterior_image_2_left",
+                    "high": null,
+                    "nav": null,
+                    "left_wrist": null,
+                    "right_wrist": null
+                },
+                "proprio_obs_keys": {
+                    "bimanual": null,
+                    "quadruped": null
+                },
+                "proprio_obs_dims": {
+                    "bimanual": 14,
+                    "quadruped": 59
+                },
+                "action_normalization_mask": [
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    false
+                ],
+                "language_key": "language_instruction",
+                "action_proprio_normalization_type": "normal",
+                "standardize_fn": {
+                    "module": "crossformer.data.oxe.oxe_standardization_transforms",
+                    "name": "droid_dataset_transform",
+                    "args": [],
+                    "kwargs": {}
+                }
+            },
+            {
+                "name": "omnimimic_gnm_dataset",
+                "data_dir": null,
+                "image_obs_keys": {
+                    "primary": null,
+                    "high": null,
+                    "nav": "image",
+                    "left_wrist": null,
+                    "right_wrist": null
+                },
+                "proprio_obs_keys": {
+                    "bimanual": null,
+                    "quadruped": null
+                },
+                "proprio_obs_dims": {
+                    "bimanual": 14,
+                    "quadruped": 59
+                },
+                "action_normalization_mask": [
+                    true,
+                    true
+                ],
+                "language_key": "language_instruction",
+                "action_proprio_normalization_type": "normal",
+                "standardize_fn": {
+                    "module": "crossformer.data.oxe.oxe_standardization_transforms",
+                    "name": "omnimimic_gnm_transform",
+                    "args": [],
+                    "kwargs": {}
+                }
+            },
+            {
+                "name": "fractal20220817_data",
+                "data_dir": null,
+                "image_obs_keys": {
+                    "primary": "image",
+                    "high": null,
+                    "nav": null,
+                    "left_wrist": null,
+                    "right_wrist": null
+                },
+                "proprio_obs_keys": {
+                    "bimanual": null,
+                    "quadruped": null
+                },
+                "proprio_obs_dims": {
+                    "bimanual": 14,
+                    "quadruped": 59
+                },
+                "action_normalization_mask": [
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    false
+                ],
+                "language_key": "language_instruction",
+                "action_proprio_normalization_type": "normal",
+                "standardize_fn": {
+                    "module": "crossformer.data.oxe.oxe_standardization_transforms",
+                    "name": "rt1_dataset_transform",
+                    "args": [],
+                    "kwargs": {}
+                }
+            }
+        ],
+        "frame_transform_kwargs": {
+            "image_augment_kwargs": {
+                "high": {
+                    "augment_order": [
+                        "random_resized_crop",
+                        "random_brightness",
+                        "random_contrast",
+                        "random_saturation",
+                        "random_hue"
+                    ],
+                    "random_brightness": [
+                        0.1
+                    ],
+                    "random_contrast": [
+                        0.9,
+                        1.1
+                    ],
+                    "random_hue": [
+                        0.05
+                    ],
+                    "random_resized_crop": {
+                        "ratio": [
+                            0.75,
+                            1.3333333333333333
+                        ],
+                        "scale": [
+                            0.9,
+                            1.0
+                        ]
+                    },
+                    "random_saturation": [
+                        0.9,
+                        1.1
+                    ]
+                },
+                "left_wrist": {
+                    "augment_order": [
+                        "random_resized_crop",
+                        "random_brightness",
+                        "random_contrast",
+                        "random_saturation",
+                        "random_hue"
+                    ],
+                    "random_brightness": [
+                        0.1
+                    ],
+                    "random_contrast": [
+                        0.9,
+                        1.1
+                    ],
+                    "random_hue": [
+                        0.05
+                    ],
+                    "random_resized_crop": {
+                        "ratio": [
+                            0.75,
+                            1.3333333333333333
+                        ],
+                        "scale": [
+                            0.9,
+                            1.0
+                        ]
+                    },
+                    "random_saturation": [
+                        0.9,
+                        1.1
+                    ]
+                },
+                "nav": {
+                    "augment_order": [
+                        "random_resized_crop",
+                        "random_brightness",
+                        "random_contrast",
+                        "random_saturation",
+                        "random_hue"
+                    ],
+                    "random_brightness": [
+                        0.1
+                    ],
+                    "random_contrast": [
+                        0.9,
+                        1.1
+                    ],
+                    "random_hue": [
+                        0.05
+                    ],
+                    "random_resized_crop": {
+                        "ratio": [
+                            0.9,
+                            1.1
+                        ],
+                        "scale": [
+                            0.8,
+                            1.0
+                        ]
+                    },
+                    "random_saturation": [
+                        0.9,
+                        1.1
+                    ]
+                },
+                "primary": {
+                    "augment_order": [
+                        "random_resized_crop",
+                        "random_brightness",
+                        "random_contrast",
+                        "random_saturation",
+                        "random_hue"
+                    ],
+                    "random_brightness": [
+                        0.1
+                    ],
+                    "random_contrast": [
+                        0.9,
+                        1.1
+                    ],
+                    "random_hue": [
+                        0.05
+                    ],
+                    "random_resized_crop": {
+                        "ratio": [
+                            0.9,
+                            1.1
+                        ],
+                        "scale": [
+                            0.8,
+                            1.0
+                        ]
+                    },
+                    "random_saturation": [
+                        0.9,
+                        1.1
+                    ]
+                },
+                "right_wrist": {
+                    "augment_order": [
+                        "random_resized_crop",
+                        "random_brightness",
+                        "random_contrast",
+                        "random_saturation",
+                        "random_hue"
+                    ],
+                    "random_brightness": [
+                        0.1
+                    ],
+                    "random_contrast": [
+                        0.9,
+                        1.1
+                    ],
+                    "random_hue": [
+                        0.05
+                    ],
+                    "random_resized_crop": {
+                        "ratio": [
+                            0.75,
+                            1.3333333333333333
+                        ],
+                        "scale": [
+                            0.9,
+                            1.0
+                        ]
+                    },
+                    "random_saturation": [
+                        0.9,
+                        1.1
+                    ]
+                }
+            },
+            "num_parallel_calls": 200,
+            "resize_size": {
+                "high": [
+                    224,
+                    224
+                ],
+                "left_wrist": [
+                    224,
+                    224
+                ],
+                "nav": [
+                    224,
+                    224
+                ],
+                "primary": [
+                    224,
+                    224
+                ],
+                "right_wrist": [
+                    224,
+                    224
+                ]
+            }
+        },
+        "sample_weights": [
+            0.021755552811740044,
+            0.009986998241552502,
+            0.0023179438302583103,
+            0.0016371801232614254,
+            0.0008888419195460733,
+            0.007874885740329124,
+            0.0032054418194781,
+            0.004113224757060238,
+            0.006839324427193265,
+            0.01479473259297815,
+            0.015045048015813084,
+            0.0007163148639093663,
+            0.002826978440249719,
+            0.008290489894059044,
+            0.007414589603576858,
+            0.005878414243900214,
+            0.021755552811740044,
+            0.0001874782805166165,
+            0.0030709017944702635,
+            0.007599149035416076,
+            0.0026296096724881066,
+            0.0005253087662862543,
+            0.0002175555281174004,
+            0.085,
+            0.014166666666666666,
+            0.014166666666666666,
+            0.014166666666666666,
+            0.014166666666666666,
+            0.014166666666666666,
+            0.014166666666666666,
+            0.17,
+            0.085,
+            0.085,
+            0.17,
+            0.17
+        ],
+        "shuffle_buffer_size": 25000,
+        "traj_read_threads": 48,
+        "traj_transform_kwargs": {
+            "action_horizon": 100,
+            "goal_relabeling_kwargs": {
+                "max_goal_distance": 15
+            },
+            "goal_relabeling_strategy": "uniform",
+            "head_to_dataset": {
+                "bimanual": [
+                    "aloha_pen_uncap_diverse_dataset",
+                    "aloha_dough_cut_dataset",
+                    "aloha_lucy_dataset",
+                    "aloha_drawer_dataset",
+                    "aloha_pick_place_dataset",
+                    "aloha_static_dataset",
+                    "aloha_sushi_cut_full_dataset"
+                ],
+                "nav": [
+                    "omnimimic_gnm_dataset"
+                ],
+                "quadruped": [
+                    "go1"
+                ],
+                "single_arm": [
+                    "bridge_dataset",
+                    "fractal20220817_data",
+                    "kuka",
+                    "taco_play",
+                    "taco_extra",
+                    "jaco_play",
+                    "berkeley_cable_routing",
+                    "roboturk",
+                    "nyu_door_opening_surprising_effectiveness",
+                    "viola",
+                    "berkeley_autolab_ur5",
+                    "toto",
+                    "language_table",
+                    "stanford_hydra_dataset_converted_externally_to_rlds",
+                    "austin_buds_dataset_converted_externally_to_rlds",
+                    "nyu_franka_play_dataset_converted_externally_to_rlds",
+                    "furniture_bench_dataset_converted_externally_to_rlds",
+                    "austin_sailor_dataset_converted_externally_to_rlds",
+                    "austin_sirius_dataset_converted_externally_to_rlds",
+                    "bc_z",
+                    "dlr_edan_shared_control_converted_externally_to_rlds",
+                    "iamlab_cmu_pickup_insert_converted_externally_to_rlds",
+                    "utaustin_mutex",
+                    "berkeley_fanuc_manipulation",
+                    "cmu_stretch",
+                    "droid",
+                    "droid_wipe"
+                ]
+            },
+            "max_action_dim": 14,
+            "subsample_length": 100,
+            "task_augment_kwargs": {
+                "keep_image_prob": 1.0
+            },
+            "task_augment_strategy": "delete_task_conditioning",
+            "window_size": 5
+        },
+        "traj_transform_threads": 48
+    },
+    "eval_datasets": [],
+    "eval_interval": 5e+20,
+    "log_interval": 500,
+    "model": {
+        "heads": {
+            "bimanual": {
+                "args": [],
+                "kwargs": {
+                    "action_dim": 14,
+                    "action_horizon": 100,
+                    "clip_pred": false,
+                    "constrain_loss_dims": true,
+                    "loss_weight": 1.0,
+                    "num_preds": 14,
+                    "pool_strategy": "pass",
+                    "readout_key": "readout_bimanual"
+                },
+                "module": "crossformer.model.components.action_heads",
+                "name": "L1ActionHead"
+            },
+            "nav": {
+                "args": [],
+                "kwargs": {
+                    "action_dim": 2,
+                    "action_horizon": 4,
+                    "clip_pred": false,
+                    "constrain_loss_dims": true,
+                    "loss_weight": 1.0,
+                    "num_preds": 2,
+                    "pool_strategy": "pass",
+                    "readout_key": "readout_nav"
+                },
+                "module": "crossformer.model.components.action_heads",
+                "name": "L1ActionHead"
+            },
+            "quadruped": {
+                "args": [],
+                "kwargs": {
+                    "action_dim": 12,
+                    "action_horizon": 1,
+                    "clip_pred": false,
+                    "constrain_loss_dims": true,
+                    "loss_weight": 1.0,
+                    "num_preds": 12,
+                    "pool_strategy": "pass",
+                    "readout_key": "readout_quadruped"
+                },
+                "module": "crossformer.model.components.action_heads",
+                "name": "L1ActionHead"
+            },
+            "single_arm": {
+                "args": [],
+                "kwargs": {
+                    "action_dim": 7,
+                    "action_horizon": 4,
+                    "clip_pred": false,
+                    "constrain_loss_dims": true,
+                    "loss_weight": 1.0,
+                    "num_preds": 7,
+                    "pool_strategy": "pass",
+                    "readout_key": "readout_single_arm"
+                },
+                "module": "crossformer.model.components.action_heads",
+                "name": "L1ActionHead"
+            }
+        },
+        "max_horizon": 10,
+        "observation_tokenizers": {
+            "bimanual": {
+                "args": [],
+                "kwargs": {
+                    "dropout_rate": 0.2,
+                    "obs_keys": [
+                        "proprio_bimanual"
+                    ]
+                },
+                "module": "crossformer.model.components.tokenizers",
+                "name": "LowdimObsTokenizer"
+            },
+            "high": {
+                "args": [],
+                "kwargs": {
+                    "encoder": {
+                        "args": [],
+                        "kwargs": {},
+                        "module": "crossformer.model.components.vit_encoders",
+                        "name": "ResNet26FILM"
+                    },
+                    "obs_stack_keys": [
+                        "image_high"
+                    ],
+                    "task_film_keys": [
+                        "language_instruction"
+                    ],
+                    "task_stack_keys": [
+                        "image_high"
+                    ]
+                },
+                "module": "crossformer.model.components.tokenizers",
+                "name": "ImageTokenizer"
+            },
+            "left": {
+                "args": [],
+                "kwargs": {
+                    "encoder": {
+                        "args": [],
+                        "kwargs": {},
+                        "module": "crossformer.model.components.vit_encoders",
+                        "name": "ResNet26FILM"
+                    },
+                    "obs_stack_keys": [
+                        "image_left_wrist"
+                    ],
+                    "task_film_keys": [
+                        "language_instruction"
+                    ],
+                    "task_stack_keys": []
+                },
+                "module": "crossformer.model.components.tokenizers",
+                "name": "ImageTokenizer"
+            },
+            "nav": {
+                "args": [],
+                "kwargs": {
+                    "encoder": {
+                        "args": [],
+                        "kwargs": {},
+                        "module": "crossformer.model.components.vit_encoders",
+                        "name": "ResNet26"
+                    },
+                    "obs_stack_keys": [
+                        "image_nav"
+                    ],
+                    "task_film_keys": [],
+                    "task_stack_keys": [
+                        "image_nav"
+                    ]
+                },
+                "module": "crossformer.model.components.tokenizers",
+                "name": "ImageTokenizer"
+            },
+            "primary": {
+                "args": [],
+                "kwargs": {
+                    "encoder": {
+                        "args": [],
+                        "kwargs": {},
+                        "module": "crossformer.model.components.vit_encoders",
+                        "name": "ResNet26FILM"
+                    },
+                    "obs_stack_keys": [
+                        "image_primary"
+                    ],
+                    "task_film_keys": [
+                        "language_instruction"
+                    ],
+                    "task_stack_keys": [
+                        "image_primary"
+                    ]
+                },
+                "module": "crossformer.model.components.tokenizers",
+                "name": "ImageTokenizer"
+            },
+            "quadruped": {
+                "args": [],
+                "kwargs": {
+                    "obs_keys": [
+                        "proprio_quadruped"
+                    ]
+                },
+                "module": "crossformer.model.components.tokenizers",
+                "name": "LowdimObsTokenizer"
+            },
+            "right": {
+                "args": [],
+                "kwargs": {
+                    "encoder": {
+                        "args": [],
+                        "kwargs": {},
+                        "module": "crossformer.model.components.vit_encoders",
+                        "name": "ResNet26FILM"
+                    },
+                    "obs_stack_keys": [
+                        "image_right_wrist"
+                    ],
+                    "task_film_keys": [
+                        "language_instruction"
+                    ],
+                    "task_stack_keys": []
+                },
+                "module": "crossformer.model.components.tokenizers",
+                "name": "ImageTokenizer"
+            }
+        },
+        "readouts": {
+            "bimanual": 100,
+            "nav": 4,
+            "quadruped": 1,
+            "single_arm": 4
+        },
+        "repeat_task_tokens": true,
+        "task_tokenizers": {},
+        "token_embedding_size": 512,
+        "transformer_kwargs": {
+            "attention_dropout_rate": 0.0,
+            "dropout_rate": 0.1,
+            "mlp_dim": 2048,
+            "num_attention_heads": 8,
+            "num_layers": 12,
+            "repeat_pos_enc": true
+        }
+    },
+    "num_steps": 300000,
+    "optimizer": {
+        "clip_gradient": 1.0,
+        "frozen_keys": [],
+        "learning_rate": {
+            "init_value": 0.0,
+            "name": "rsqrt",
+            "peak_value": 0.0003,
+            "timescale": 10000,
+            "warmup_steps": 2000
+        },
+        "weight_decay": 0.1
+    },
+    "prefetch_num_batches": 0,
+    "pretrained_loaders": [
+        {
+            "module": "experiments.sudeep.aloha.resnet_pt",
+            "name": "resnet_26_loader",
+            "args": [],
+            "kwargs": {
+                "restore_path": ""
+            }
+        }
+    ],
+    "resume_path": null,
+    "save_dir": null,
+    "save_interval": 10000,
+    "seed": 42,
+    "skip_norm_keys": [
+        "proprio_bimanual"
+    ],
+    "start_step": null,
+    "text_processor": {
+        "args": [],
+        "kwargs": {},
+        "module": "crossformer.data.utils.text_processing",
+        "name": "UniversalSentenceEncoder"
+    },
+    "val_kwargs": {
+        "num_val_batches": 16,
+        "val_shuffle_buffer_size": 1000
+    },
+    "viz_datasets": [],
+    "viz_interval": 5e+20,
+    "viz_kwargs": {
+        "eval_batch_size": 128,
+        "samples_per_state": 8,
+        "trajs_for_metrics": 100,
+        "trajs_for_viz": 8
+    },
+    "wandb": {
+        "entity": null,
+        "group": null,
+        "project": "crossformer"
+    },
+    "wandb_resume_id": null,
+    "window_size": 5
+}
