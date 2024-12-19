@@ -143,6 +143,9 @@ class GraspGenerator:
             ##### GGCNN #####
             depth = np.expand_dims(np.array(depth), axis=2)
             depth_img = torch.tensor(depth, dtype=torch.float32).permute(2, 0, 1).unsqueeze(0).to(self.device)
+        elif self.network == "crossformer":
+            ##### Crossformer #####
+            exit()
         else:
             print("The selected network has not been implemented yet -- please choose another network!")
             exit() 
