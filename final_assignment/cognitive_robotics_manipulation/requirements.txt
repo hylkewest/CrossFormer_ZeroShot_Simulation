@@ -1,9 +1,9 @@
-numpy>=1.18.5,<1.24
+numpy
 scikit-build
-matplotlib==3.3.3
-scikit-image==0.17.2
-scikit-learn>=0.23.2
-opencv-python>=4.5.1.48
+matplotlib
+scikit-image
+scikit-learn
+opencv-python
 imageio
 torch
 torchvision
