@@ -29,10 +29,11 @@ class GrasppingScenarios():
             self.IMG_SIZE = 300
             self.network_path = 'trained_models/GGCNN/ggcnn_weights_cornell/ggcnn_epoch_23_cornell'
             sys.path.append('trained_models/GGCNN')
-        elif (network_model == "crossformer"):
-            ##### Crossformer #####
-            self.network_path = 'trained_models/crossformer/300000/default/checkpoint'
-            sys.path.append('trained_models/crossformer')
+        elif (network_model == "CrossFormer"):
+            ##### CrossFormer #####
+            self.IMG_SIZE = 224
+            self.network_path = 'trained_models/CrossFormer/pretrained_model/crossformer'
+            sys.path.append('trained_models/CrossFormer')
         else:
             print("The selected network has not been implemented yet!")
             exit() 

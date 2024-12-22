@@ -1,8 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
-from numpy.lib.npyio import save
 import torch.utils.data
-from PIL import Image
 from datetime import datetime
 
 from network.hardware.device import get_device
@@ -10,8 +8,12 @@ from network.hardware.device import get_device
 from network.utils.data.camera_data import CameraData
 from network.utils.visualisation.plot import plot_results
 from network.utils.dataset_processing.grasp import detect_grasps
+from trained_models.CrossFormer.crossformer_wrapper import CrossFormerWrapper
+from crossformer.model.crossformer_model import CrossFormerModel
 from skimage.filters import gaussian
 import os
+import jax
+import jax.numpy as jnp
 import cv2
 
 class GraspGenerator:
@@ -24,8 +26,19 @@ class GraspGenerator:
 
     def __init__(self, net_path, camera, depth_radius, fig, IMG_WIDTH=224, network='GR_ConvNet', device='cpu'):
 
-        if (device=='cpu'):
+        if (device=='cpu' and network != "CrossFormer"):
             self.net = torch.load(net_path, map_location=device)
+            self.device = get_device(force_cpu=True)
+        elif network == "CrossFormer":
+            model = CrossFormerModel.load_pretrained(net_path)
+
+            obs_shapes = jax.tree_map(jnp.shape, model.example_batch["observation"])
+            task_shapes = jax.tree_map(jnp.shape, model.example_batch["task"])
+
+            print("Observation shapes:", obs_shapes)
+            print("Task shapes:", task_shapes)  
+
+            self.net = CrossFormerWrapper(model, model.params)
             self.device = get_device(force_cpu=True)
         else:
             #self.net = torch.load(net_path, map_location=lambda storage, loc: storage.cuda(1))
@@ -143,9 +156,11 @@ class GraspGenerator:
             ##### GGCNN #####
             depth = np.expand_dims(np.array(depth), axis=2)
             depth_img = torch.tensor(depth, dtype=torch.float32).permute(2, 0, 1).unsqueeze(0).to(self.device)
-        elif self.network == "crossformer":
-            ##### Crossformer #####
-            exit()
+        elif self.network == "CrossFormer":
+            ##### CrossFormer #####
+            actions_np = self.net.single_step_forward(rgb, depth)
+            action_tokens = actions_np[0, 0]  # shape => (action_horizon, action_dim)
+
         else:
             print("The selected network has not been implemented yet -- please choose another network!")
             exit() 
@@ -166,6 +181,12 @@ class GraspGenerator:
                 pred = self.net(depth_img)
                 q_img, ang_img, width_img = self.post_process_output(
                     pred[0], pred[1], pred[2], pred[3], int(self.MAX_GRASP * self.PIX_CONVERSION))
+            elif self.network == "CrossFormer":
+                q_img, ang_img, width_img = self.post_process_crossformer_output(
+                    action_tokens,         # e.g. shape (N, 5)
+                    (self.IMG_WIDTH, self.IMG_WIDTH),
+                    n_grasps=n_grasps
+                )
             else: 
                 print ("you need to add your function here!")        
         
@@ -195,9 +216,9 @@ class GraspGenerator:
         # Pass only the required data based on the network type
         if self.network == 'GGCNN':
             # GGCNN uses depth-only data
-            predictions, save_name = self.predict(None, depth, n_grasps=n_grasps, show_output=show_output)
+            predictions, save_name = self.predict(None, depth, n_grasps=n_grasps, show_output=show_output)            
         else:
-            # GR_ConvNet uses both RGB and depth
+            # GR_ConvNet and CrossFormer both use RGB and depth
             predictions, save_name = self.predict(rgb, depth, n_grasps=n_grasps, show_output=show_output)
 
         grasps = []
@@ -206,4 +227,42 @@ class GraspGenerator:
             grasps.append((x, y, z, roll, opening_len, obj_height))
 
         return grasps, save_name
+    
+    def tokenize_input(self, rgb, depth, patch_size=16):
+        """
+        Tokenize RGB and depth input into patches.
+        :param rgb: RGB image as NumPy array.
+        :param depth: Depth image as NumPy array.
+        :param patch_size: Size of patches for tokenization.
+        :return: Torch tensor of tokenized patches.
+        """
+        # Combine RGB and Depth
+        rgb_depth = np.concatenate((rgb, np.expand_dims(depth, axis=-1)), axis=-1)  # Shape: (H, W, 4)
+
+        # Reshape into patches
+        H, W, C = rgb_depth.shape
+        patches = [
+            rgb_depth[i:i+patch_size, j:j+patch_size]
+            for i in range(0, H, patch_size)
+            for j in range(0, W, patch_size)
+        ]
+
+        patches = np.stack(patches, axis=0)  # (num_patches, patch_size, patch_size, C)
+        return torch.tensor(patches, dtype=torch.float32).permute(0, 3, 1, 2)  # (num_patches, C, patch_size, patch_size)
+
+    
+    def post_process_crossformer_output(self, outputs, image_shape, n_grasps=1):
+        # Expecting e.g. outputs shape (N, 5): [confidence, x_offset, y_offset, angle, width]
+        predictions = []
+        for output in outputs:
+            confidence, x_offset, y_offset, angle, width = output
+            x = x_offset * image_shape[1]
+            y = y_offset * image_shape[0]
+            predictions.append((x, y, angle, width, confidence))
+        
+        predictions = sorted(predictions, key=lambda x: x[-1], reverse=True)
+        return predictions[:n_grasps]
+
+
+
 
