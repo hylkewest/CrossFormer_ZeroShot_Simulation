@@ -34,6 +34,7 @@ class CrossFormerWrapper:
             # use the model’s required pad mask for timesteps:
             timestep_pad_mask=observations["timestep_pad_mask"], 
             train=False,
+            head_name="single_arm",  # or whichever is relevant
             argmax=True,
             rng=jax.random.PRNGKey(0)
         )

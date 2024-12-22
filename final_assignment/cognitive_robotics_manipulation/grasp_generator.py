@@ -34,9 +34,11 @@ class GraspGenerator:
 
             obs_shapes = jax.tree_map(jnp.shape, model.example_batch["observation"])
             task_shapes = jax.tree_map(jnp.shape, model.example_batch["task"])
+            test = jax.tree_map(jnp.shape, model.example_batch)
 
             print("Observation shapes:", obs_shapes)
             print("Task shapes:", task_shapes)  
+            print("Example Batch: ", test)
 
             self.net = CrossFormerWrapper(model, model.params)
             self.device = get_device(force_cpu=True)
@@ -184,12 +186,19 @@ class GraspGenerator:
             elif self.network == "CrossFormer":
                 q_img, ang_img, width_img = self.post_process_crossformer_output(
                     action_tokens,         # e.g. shape (N, 5)
-                    (self.IMG_WIDTH, self.IMG_WIDTH),
-                    n_grasps=n_grasps
+                    (self.IMG_WIDTH, self.IMG_WIDTH)
                 )
             else: 
                 print ("you need to add your function here!")        
         
+
+        print("q_img: ", len(q_img[0]))
+        print("ang_img: ", ang_img)
+        print("width_img: ", width_img)
+        print("------------------")
+        print("------------------")
+        print("------------------")
+        print("pred: ", pred)
         save_name = None
         if show_output:
             #fig = plt.figure(figsize=(10, 10))
@@ -252,17 +261,34 @@ class GraspGenerator:
 
     
     def post_process_crossformer_output(self, outputs, image_shape, n_grasps=1):
-        # Expecting e.g. outputs shape (N, 5): [confidence, x_offset, y_offset, angle, width]
-        predictions = []
-        for output in outputs:
-            confidence, x_offset, y_offset, angle, width = output
-            x = x_offset * image_shape[1]
-            y = y_offset * image_shape[0]
-            predictions.append((x, y, angle, width, confidence))
-        
-        predictions = sorted(predictions, key=lambda x: x[-1], reverse=True)
-        return predictions[:n_grasps]
+        """
+        Convert a single 1D vector of length 7 (or some other dimension)
+        into three 2D arrays: q_img, ang_img, width_img.
 
+        This is a hack: we just broadcast single values across the entire image
+        so we can feed them into code that expects (H, W) arrays.
+        """
+
+        # E.g. your outputs might be shape (7,):
+        # [-0.36911106 -0.08262344  0.1350437  -0.05571371  0.6404867  -0.20162565 0.03894573]
+
+        # Let's say we interpret them as follows (just an example):
+        #  0 => q_value (like confidence)
+        #  1 => angle_value
+        #  2 => width_value
+        # and ignore the rest (or use them for other logic).
+        q_val = outputs[0]
+        angle_val = outputs[1]
+        width_val = outputs[2]
+
+        H, W = image_shape
+        # Create uniform 2D arrays
+        q_img = np.full((H, W), q_val, dtype=np.float32)
+        ang_img = np.full((H, W), angle_val, dtype=np.float32)
+        width_img = np.full((H, W), width_val, dtype=np.float32)
+
+        # Return exactly three 2D arrays, as your simulation expects
+        return q_img, ang_img, width_img
 
 
 
