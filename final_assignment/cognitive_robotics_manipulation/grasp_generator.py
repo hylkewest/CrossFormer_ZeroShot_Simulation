@@ -31,15 +31,6 @@ class GraspGenerator:
             self.device = get_device(force_cpu=True)
         elif network == "CrossFormer":
             model = CrossFormerModel.load_pretrained(net_path)
-
-            obs_shapes = jax.tree_map(jnp.shape, model.example_batch["observation"])
-            task_shapes = jax.tree_map(jnp.shape, model.example_batch["task"])
-            test = jax.tree_map(jnp.shape, model.example_batch)
-
-            print("Observation shapes:", obs_shapes)
-            print("Task shapes:", task_shapes)  
-            print("Example Batch: ", test)
-
             self.net = CrossFormerWrapper(model, model.params)
             self.device = get_device(force_cpu=True)
         else:
@@ -48,9 +39,6 @@ class GraspGenerator:
             print ("GPU is not supported yet! :( -- continuing experiment on CPU!" )
             self.net = torch.load(net_path, map_location='cpu')
             self.device = get_device(force_cpu=True)
-
-        # print (self.net)
-
         
         self.near = camera.near
         self.far = camera.far
@@ -62,7 +50,7 @@ class GraspGenerator:
         self.PIX_CONVERSION = 277 * IMG_WIDTH/224
 
         self.IMG_WIDTH = IMG_WIDTH
-        print (self.IMG_WIDTH)
+        # print (self.IMG_WIDTH)
 
         # Get rotation matrix
         img_center = self.IMG_WIDTH / 2 - 0.5
@@ -89,10 +77,10 @@ class GraspGenerator:
         x_p, y_p = grasp.center[0], grasp.center[1]
 
         # Get area of depth values around center pixel
-        x_min = np.clip(x_p-self.depth_r, 0, self.IMG_WIDTH)
-        x_max = np.clip(x_p+self.depth_r, 0, self.IMG_WIDTH)
-        y_min = np.clip(y_p-self.depth_r, 0, self.IMG_WIDTH)
-        y_max = np.clip(y_p+self.depth_r, 0, self.IMG_WIDTH)
+        x_min = int(np.clip(x_p - self.depth_r, 0, self.IMG_WIDTH))
+        x_max = int(np.clip(x_p + self.depth_r, 0, self.IMG_WIDTH))
+        y_min = int(np.clip(y_p - self.depth_r, 0, self.IMG_WIDTH))
+        y_max = int(np.clip(y_p + self.depth_r, 0, self.IMG_WIDTH))
         depth_values = depth_img[x_min:x_max, y_min:y_max]
 
         # Get minimum depth value from selected area
@@ -160,8 +148,9 @@ class GraspGenerator:
             depth_img = torch.tensor(depth, dtype=torch.float32).permute(2, 0, 1).unsqueeze(0).to(self.device)
         elif self.network == "CrossFormer":
             ##### CrossFormer #####
-            actions_np = self.net.single_step_forward(rgb, depth)
-            action_tokens = actions_np[0, 0]  # shape => (action_horizon, action_dim)
+            print("CrossFormer")
+            # actions_np = self.net.single_step_forward(rgb, depth)
+            # action_tokens = actions_np[0, 0]  # shape => (action_horizon, action_dim)
 
         else:
             print("The selected network has not been implemented yet -- please choose another network!")
@@ -172,33 +161,26 @@ class GraspGenerator:
                 ##### GR-ConvNet #####
                 xc = x.to(self.device)
                 pred = self.net.predict(xc)
-                # print (pred)
                 pixels_max_grasp = int(self.MAX_GRASP * self.PIX_CONVERSION)
-                q_img, ang_img, width_img = self.post_process_output(pred['pos'],
-                                                                pred['cos'],
-                                                                pred['sin'],
-                                                                pred['width'],
-                                                                pixels_max_grasp)
-            elif self.network == 'GGCNN':
-                pred = self.net(depth_img)
                 q_img, ang_img, width_img = self.post_process_output(
-                    pred[0], pred[1], pred[2], pred[3], int(self.MAX_GRASP * self.PIX_CONVERSION))
-            elif self.network == "CrossFormer":
-                q_img, ang_img, width_img = self.post_process_crossformer_output(
-                    action_tokens,         # e.g. shape (N, 5)
-                    (self.IMG_WIDTH, self.IMG_WIDTH)
+                    pred['pos'], pred['cos'], pred['sin'], pred['width'], pixels_max_grasp
                 )
+            elif self.network == 'GGCNN':
+                ##### GGCNN #####
+                pred = self.net(depth_img)
+                pixels_max_grasp = int(self.MAX_GRASP * self.PIX_CONVERSION)
+                q_img, ang_img, width_img = self.post_process_output(
+                    pred[0], pred[1], pred[2], pred[3], pixels_max_grasp
+                )
+            elif self.network == "CrossFormer":
+                ##### CrossFormer #####
+                actions = self.net.single_step_forward(rgb, depth)
+                time = datetime.now().strftime('%Y-%m-%d %H-%M-%S')
+                save_name = 'network_output/{}'.format(time)
+                return actions, save_name
             else: 
                 print ("you need to add your function here!")        
         
-
-        print("q_img: ", len(q_img[0]))
-        print("ang_img: ", ang_img)
-        print("width_img: ", width_img)
-        print("------------------")
-        print("------------------")
-        print("------------------")
-        print("pred: ", pred)
         save_name = None
         if show_output:
             #fig = plt.figure(figsize=(10, 10))
@@ -232,63 +214,133 @@ class GraspGenerator:
 
         grasps = []
         for grasp in predictions:
-            x, y, z, roll, opening_len, obj_height = self.grasp_to_robot_frame(grasp, depth)
+            if self.network == "CrossFormer":
+                x, y, z, roll, opening_len, obj_height = self.grasp_to_robot_frame_crossformer(grasp, depth)
+            else: 
+                x, y, z, roll, opening_len, obj_height = self.grasp_to_robot_frame(grasp, depth)
+
             grasps.append((x, y, z, roll, opening_len, obj_height))
 
         return grasps, save_name
     
-    def tokenize_input(self, rgb, depth, patch_size=16):
-        """
-        Tokenize RGB and depth input into patches.
-        :param rgb: RGB image as NumPy array.
-        :param depth: Depth image as NumPy array.
-        :param patch_size: Size of patches for tokenization.
-        :return: Torch tensor of tokenized patches.
-        """
-        # Combine RGB and Depth
-        rgb_depth = np.concatenate((rgb, np.expand_dims(depth, axis=-1)), axis=-1)  # Shape: (H, W, 4)
+    def grasp_to_robot_frame_crossformer(self, grasp, depth_img):
+        # Get x, y, z of center pixel
+        x_p, y_p = grasp[0], grasp[1]
 
-        # Reshape into patches
-        H, W, C = rgb_depth.shape
-        patches = [
-            rgb_depth[i:i+patch_size, j:j+patch_size]
-            for i in range(0, H, patch_size)
-            for j in range(0, W, patch_size)
-        ]
+        # Get area of depth values around center pixel
+        x_min = int(np.clip(x_p - self.depth_r, 0, self.IMG_WIDTH))
+        x_max = int(np.clip(x_p + self.depth_r, 0, self.IMG_WIDTH))
+        y_min = int(np.clip(y_p - self.depth_r, 0, self.IMG_WIDTH))
+        y_max = int(np.clip(y_p + self.depth_r, 0, self.IMG_WIDTH))
 
-        patches = np.stack(patches, axis=0)  # (num_patches, patch_size, patch_size, C)
-        return torch.tensor(patches, dtype=torch.float32).permute(0, 3, 1, 2)  # (num_patches, C, patch_size, patch_size)
+        depth_values = depth_img[x_min:x_max, y_min:y_max]
 
+        # Get minimum depth value from selected area
+        z_p = np.amin(depth_values)
+
+        # Convert pixels to meters
+        x_p /= self.PIX_CONVERSION
+        y_p /= self.PIX_CONVERSION
+        z_p = self.far * self.near / (self.far - (self.far - self.near) * z_p)
+
+        # Convert image space to camera's 3D space
+        img_xyz = np.array([x_p, y_p, -z_p, 1])
+        cam_space = np.matmul(self.img_to_cam, img_xyz)
+
+        # Convert camera's 3D space to robot frame of reference
+        robot_frame_ref = np.matmul(self.cam_to_robot_base, cam_space)
+
+        # Change direction of the angle and rotate by alpha rad
+        roll = grasp[5] * -1 + (self.IMG_ROTATION)
+        if roll < -np.pi / 2:
+            roll += np.pi
+
+        # Covert pixel width to gripper width
+        opening_length = (grasp[6] / int(self.MAX_GRASP *
+                          self.PIX_CONVERSION)) * self.MAX_GRASP
+
+        obj_height = self.DIST_BACKGROUND - z_p
+
+        # return x, y, z, roll, opening length gripper
+        return robot_frame_ref[0], robot_frame_ref[1], robot_frame_ref[2], roll, opening_length, obj_height
+
+
+    # def tokenize_input(self, rgb, depth, patch_size=16):
+    #     """
+    #     Tokenize RGB and depth input into patches.
+    #     :param rgb: RGB image as NumPy array.
+    #     :param depth: Depth image as NumPy array.
+    #     :param patch_size: Size of patches for tokenization.
+    #     :return: Torch tensor of tokenized patches.
+    #     """
+    #     # Combine RGB and Depth
+    #     rgb_depth = np.concatenate((rgb, np.expand_dims(depth, axis=-1)), axis=-1)  # Shape: (H, W, 4)
+
+    #     # Reshape into patches
+    #     H, W, C = rgb_depth.shape
+    #     patches = [
+    #         rgb_depth[i:i+patch_size, j:j+patch_size]
+    #         for i in range(0, H, patch_size)
+    #         for j in range(0, W, patch_size)
+    #     ]
+
+    #     patches = np.stack(patches, axis=0)  # (num_patches, patch_size, patch_size, C)
+    #     return torch.tensor(patches, dtype=torch.float32).permute(0, 3, 1, 2)  # (num_patches, C, patch_size, patch_size)
+
+
+    # def parse_single_pose(self, unnorm_tokens):
+    #     """
+    #     Suppose your final single action is 5 floats: (x_px, y_px, angle, width, conf).
+    #     Or you might have 7 floats. 
+    #     We'll parse them accordingly.
+    #     """
+    #     # Example:
+    #     x_px = unnorm_tokens[0]
+    #     y_px = unnorm_tokens[1]
+    #     angle = unnorm_tokens[2]
+    #     width = unnorm_tokens[3]
+    #     confidence = unnorm_tokens[4]  # if present
+
+    #     # Return as a simple tuple
+    #     return (x_px, y_px, angle, width, confidence)
     
-    def post_process_crossformer_output(self, outputs, image_shape, n_grasps=1):
-        """
-        Convert a single 1D vector of length 7 (or some other dimension)
-        into three 2D arrays: q_img, ang_img, width_img.
+    # def unnormalize_action(self, action_tokens):
+    #     """
+    #     If your model returns coords in [-1, 1], convert them to [0, IMG_WIDTH].
+    #     For instance, if self.IMG_WIDTH=224, then -1 -> 0, +1 -> 224.
+    #     """
+    #     # Suppose action_tokens = [x_raw, y_raw, angle, width, etc.]
+    #     x_raw = action_tokens[0]
+    #     y_raw = action_tokens[1]
+        
+    #     x_pixel = (x_raw + 1) / 2 * self.IMG_WIDTH
+    #     y_pixel = (y_raw + 1) / 2 * self.IMG_WIDTH
 
-        This is a hack: we just broadcast single values across the entire image
-        so we can feed them into code that expects (H, W) arrays.
-        """
+    #     # Then keep angle, width, or the rest of the vector as is,
+    #     # or do a similar unnormalization if they're also in [-1,1].
+    #     angle = action_tokens[2]
+    #     width = action_tokens[3]
+    #     confidence = action_tokens[4] if len(action_tokens) > 4 else 1.0
 
-        # E.g. your outputs might be shape (7,):
-        # [-0.36911106 -0.08262344  0.1350437  -0.05571371  0.6404867  -0.20162565 0.03894573]
+    #     return [x_pixel, y_pixel, angle, width, confidence]
 
-        # Let's say we interpret them as follows (just an example):
-        #  0 => q_value (like confidence)
-        #  1 => angle_value
-        #  2 => width_value
-        # and ignore the rest (or use them for other logic).
-        q_val = outputs[0]
-        angle_val = outputs[1]
-        width_val = outputs[2]
+    # def single_pose_to_fake_prediction(self, single_pose):
+    #     """
+    #     Convert (x_px, y_px, angle, width, confidence) into a 'grasp-like' object
+    #     that can be passed to grasp_to_robot_frame(...).
+    #     """
+    #     class FakeGrasp:
+    #         pass
 
-        H, W = image_shape
-        # Create uniform 2D arrays
-        q_img = np.full((H, W), q_val, dtype=np.float32)
-        ang_img = np.full((H, W), angle_val, dtype=np.float32)
-        width_img = np.full((H, W), width_val, dtype=np.float32)
+    #     fake = FakeGrasp()
+    #     # Typically, your code expects .center, .angle, .length
+    #     fake.center = (single_pose[0], single_pose[1])  # (x_px, y_px) in pixel coords
+    #     fake.angle = single_pose[2]
+    #     fake.length = single_pose[3]
+    #     # confidence = single_pose[4]  # not used by 'grasp_to_robot_frame', but you can store if you want
 
-        # Return exactly three 2D arrays, as your simulation expects
-        return q_img, ang_img, width_img
+    #     return fake
+        
 
 
 

@@ -18,10 +18,11 @@ class GrasppingScenarios():
     def __init__(self, network_model="GGCNN"):
         
         self.network_model = network_model
+        self.IMG_SIZE = 224
 
         if (network_model == "GR_ConvNet"):
             ##### GR-ConvNet #####
-            self.IMG_SIZE = 224
+            # self.IMG_SIZE = 224
             self.network_path = 'trained_models/GR_ConvNet/cornell-randsplit-rgbd-grconvnet3-drop1-ch32/epoch_19_iou_0.98'
             sys.path.append('trained_models/GR_ConvNet')
         elif (network_model == "GGCNN"):
@@ -31,7 +32,7 @@ class GrasppingScenarios():
             sys.path.append('trained_models/GGCNN')
         elif (network_model == "CrossFormer"):
             ##### CrossFormer #####
-            self.IMG_SIZE = 224
+            # self.IMG_SIZE = 224
             self.network_path = 'trained_models/CrossFormer/pretrained_model/crossformer'
             sys.path.append('trained_models/CrossFormer')
         else:
