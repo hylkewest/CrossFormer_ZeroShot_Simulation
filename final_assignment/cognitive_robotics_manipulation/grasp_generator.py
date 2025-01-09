@@ -8,9 +8,11 @@ from network.hardware.device import get_device
 from network.utils.data.camera_data import CameraData
 from network.utils.visualisation.plot import plot_results
 from network.utils.dataset_processing.grasp import detect_grasps
+from environment.env import Environment
 from trained_models.CrossFormer.crossformer_wrapper import CrossFormerWrapper
 from crossformer.model.crossformer_model import CrossFormerModel
 from skimage.filters import gaussian
+import pybullet as p
 import os
 import jax
 import jax.numpy as jnp
@@ -30,16 +32,19 @@ class GraspGenerator:
             self.net = torch.load(net_path, map_location=device)
             self.device = get_device(force_cpu=True)
         elif network == "CrossFormer":
-            model = CrossFormerModel.load_pretrained(net_path)
-            self.net = CrossFormerWrapper(model, model.params)
-            self.device = get_device(force_cpu=True)
+            # model = CrossFormerModel.load_pretrained(net_path)
+            # self.net = CrossFormerWrapper(model, model.params)
+            # self.device = get_device(force_cpu=True)
+            print("hello")
         else:
             #self.net = torch.load(net_path, map_location=lambda storage, loc: storage.cuda(1))
             #self.device = get_device()
             print ("GPU is not supported yet! :( -- continuing experiment on CPU!" )
             self.net = torch.load(net_path, map_location='cpu')
             self.device = get_device(force_cpu=True)
-        
+
+        np.set_printoptions(suppress=True, precision=8)
+    
         self.near = camera.near
         self.far = camera.far
         self.depth_r = depth_radius
@@ -75,6 +80,9 @@ class GraspGenerator:
         """
         # Get x, y, z of center pixel
         x_p, y_p = grasp.center[0], grasp.center[1]
+
+        print("x_p: ", x_p)
+        print("x_p: ", y_p)
 
         # Get area of depth values around center pixel
         x_min = int(np.clip(x_p - self.depth_r, 0, self.IMG_WIDTH))
@@ -136,6 +144,8 @@ class GraspGenerator:
         max_val = np.max(depth)
         depth = depth * (255 / max_val)
         depth = np.clip((depth - depth.mean())/175, -1, 1)
+
+        print(self.network)
         
         if (self.network == 'GR_ConvNet'):
             ##### GR-ConvNet #####
@@ -215,54 +225,22 @@ class GraspGenerator:
         grasps = []
         for grasp in predictions:
             if self.network == "CrossFormer":
-                x, y, z, roll, opening_len, obj_height = self.grasp_to_robot_frame_crossformer(grasp, depth)
+                grasp
+                starting_pos = np.array([0.4958126339091726, 0.10914993600132894, 1.21110183716901, -3.140626890894155, 1.5446709877086156, -3.141564660437764])
+                new_pos = starting_pos + np.array(grasp[0:6])
+                print("----------------")
+                print("new_pos: ")
+                print(new_pos)
+                print("----------------")
+                print("----------------")
+
+                grasps.append(new_pos)
             else: 
                 x, y, z, roll, opening_len, obj_height = self.grasp_to_robot_frame(grasp, depth)
 
-            grasps.append((x, y, z, roll, opening_len, obj_height))
+                grasps.append((x, y, z, roll, opening_len, obj_height))
 
         return grasps, save_name
-    
-    def grasp_to_robot_frame_crossformer(self, grasp, depth_img):
-        # Get x, y, z of center pixel
-        x_p, y_p = grasp[0], grasp[1]
-
-        # Get area of depth values around center pixel
-        x_min = int(np.clip(x_p - self.depth_r, 0, self.IMG_WIDTH))
-        x_max = int(np.clip(x_p + self.depth_r, 0, self.IMG_WIDTH))
-        y_min = int(np.clip(y_p - self.depth_r, 0, self.IMG_WIDTH))
-        y_max = int(np.clip(y_p + self.depth_r, 0, self.IMG_WIDTH))
-
-        depth_values = depth_img[x_min:x_max, y_min:y_max]
-
-        # Get minimum depth value from selected area
-        z_p = np.amin(depth_values)
-
-        # Convert pixels to meters
-        x_p /= self.PIX_CONVERSION
-        y_p /= self.PIX_CONVERSION
-        z_p = self.far * self.near / (self.far - (self.far - self.near) * z_p)
-
-        # Convert image space to camera's 3D space
-        img_xyz = np.array([x_p, y_p, -z_p, 1])
-        cam_space = np.matmul(self.img_to_cam, img_xyz)
-
-        # Convert camera's 3D space to robot frame of reference
-        robot_frame_ref = np.matmul(self.cam_to_robot_base, cam_space)
-
-        # Change direction of the angle and rotate by alpha rad
-        roll = grasp[5] * -1 + (self.IMG_ROTATION)
-        if roll < -np.pi / 2:
-            roll += np.pi
-
-        # Covert pixel width to gripper width
-        opening_length = (grasp[6] / int(self.MAX_GRASP *
-                          self.PIX_CONVERSION)) * self.MAX_GRASP
-
-        obj_height = self.DIST_BACKGROUND - z_p
-
-        # return x, y, z, roll, opening length gripper
-        return robot_frame_ref[0], robot_frame_ref[1], robot_frame_ref[2], roll, opening_length, obj_height
 
 
     # def tokenize_input(self, rgb, depth, patch_size=16):

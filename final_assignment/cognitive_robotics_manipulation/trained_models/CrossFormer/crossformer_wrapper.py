@@ -16,8 +16,12 @@ class CrossFormerWrapper:
     def single_step_forward(self, rgb, depth):
         goal_image = rgb[None]
 
+        # task = self.model.create_tasks(
+        #     goals={"image_primary": goal_image}
+        # )
+        
         task = self.model.create_tasks(
-            goals={"image_primary": goal_image}
+            texts=["grasp the object"]        
         )
 
         goal_image_with_time_dim = goal_image[:, None, ...]
@@ -33,6 +37,7 @@ class CrossFormerWrapper:
             observation,
             task,
             head_name="single_arm",
+            unnormalization_statistics=self.model.dataset_statistics["bridge_dataset"]["action"],
             rng=jax.random.PRNGKey(0),
         )
 

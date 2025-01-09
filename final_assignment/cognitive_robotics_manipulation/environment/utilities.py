@@ -171,17 +171,18 @@ def setup_sisbot_force(p, robotID, gripper_type):
 
 
 class Camera:
-    def __init__(self, cam_pos, cam_target, near, far, size, fov):
+    def __init__(self, cam_pos, cam_target, near, far, size, fov, orientation):
         self.x, self.y, self.z = cam_pos
         self.x_t, self.y_t, self.z_t = cam_target
         self.width, self.height = size
         self.near, self.far = near, far
         self.fov = fov
+        self.orientation = orientation
 
         aspect = self.width / self.height
         self.projection_matrix = p.computeProjectionMatrixFOV(
             fov, aspect, near, far)
-        self.view_matrix = p.computeViewMatrix(cam_pos, cam_target, [0, 1, 0])
+        self.view_matrix = p.computeViewMatrix(cam_pos, cam_target, self.orientation)
 
         self.rec_id = None
 

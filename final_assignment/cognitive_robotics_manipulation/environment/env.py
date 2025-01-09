@@ -230,6 +230,24 @@ class Environment:
             self.controlGripper(controlMode=p.POSITION_CONTROL, targetPosition=0.085)
             self.step_simulation()
 
+    def get_robot_initial_pos(self):
+        user_parameters = (0, -1.5446774605904932, 1.54, -1.54,
+                           -1.5707970583733368, 0.0009377758247187636, 0.085)
+        for _ in range(60):
+            for i, name in enumerate(self.controlJoints):
+                
+                joint = self.joints[name]
+                # control robot joints
+                p.setJointMotorControl2(self.robot_id, joint.id, p.POSITION_CONTROL,
+                                        targetPosition=user_parameters[i], force=joint.maxForce,
+                                        maxVelocity=joint.maxVelocity)
+                self.step_simulation()
+                
+            self.controlGripper(controlMode=p.POSITION_CONTROL, targetPosition=0.085)
+            self.step_simulation()
+
+        return self.get_ee_pose()
+
 
 
     def move_arm_away(self):
@@ -600,6 +618,14 @@ class Environment:
         if self.debug:
             print('Failed to reach the target')
         return False, p.getLinkState(self.robot_id, self.eef_id)[0:2]
+    
+    def get_ee_pose(self):
+        real_xyz, real_xyzw = p.getLinkState(
+            self.robot_id, self.eef_id
+        )[0:2]
+        real_euler = p.getEulerFromQuaternion(real_xyzw)
+        return real_xyz, real_euler
+                    
 
     def grasp(self, pos: tuple, roll: float, gripper_opening_length: float, obj_height: float, debug: bool = False):
         """
