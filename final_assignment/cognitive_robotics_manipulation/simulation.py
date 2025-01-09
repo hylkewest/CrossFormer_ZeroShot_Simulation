@@ -97,28 +97,14 @@ class GrasppingScenarios():
         ## reporting the results at the end of experiments in the results folder
         data = IsolatedObjData(objects.obj_names, runs, 'results')
 
-        if self.network_model == "CrossFormer":
-            ## camera settings: cam_pos, cam_target, near, far, size, fov
-            # Top-down image
-            # center_x, center_y, center_z = 0.0, -0.325, 1.8
-            # camera = Camera((center_x, center_y, center_z), (center_x, center_y, 0.785), 0.1, 3.0, (self.IMG_SIZE, self.IMG_SIZE), 80, [0, 1, 0])
-            # env = Environment(camera, vis=vis, debug=debug, finger_length=0.06)
-            # generator = TrajectoryGenerator(self.network_path, camera, self.fig, self.IMG_SIZE, device)
+        ## camera settings: cam_pos, cam_target, near, far, size, fov
+        center_x, center_y, center_z = 0.05, -0.52, self.CAM_Z
+        camera = Camera((center_x, center_y, center_z), (center_x, center_y, 0.785), 0.2, 2.0, (self.IMG_SIZE, self.IMG_SIZE), 40, [0, 1, 0])
+        env = Environment(camera, vis=vis, debug=debug, finger_length=0.06)
 
-            # center_x, center_y, center_z = 0.1, -0.7, 1.5
-            # camera = Camera((center_x, center_y, center_z), (0.1, -0.2, 1.1), 0.1, 3.0, (self.IMG_SIZE, self.IMG_SIZE), 90, [0, 1, 0])
-            # env = Environment(camera, vis=vis, debug=debug, finger_length=0.06)
-            # generator = TrajectoryGenerator(self.network_path, camera, self.fig, self.IMG_SIZE, device)
-            
-            center_x, center_y, center_z =  0.9, 0.0, 1.5
-            camera = Camera((center_x, center_y, center_z), (-0.5, 0.0, 0.0), 0.2, 2.0, (self.IMG_SIZE, self.IMG_SIZE), 90, [0, 0, 1])
-            env = Environment(camera, vis=vis, debug=debug, finger_length=0.06)
+        if self.network_model == "CrossFormer":
             generator = TrajectoryGenerator(self.network_path, camera, self.fig, self.IMG_SIZE, device)
         else:    
-            ## camera settings: cam_pos, cam_target, near, far, size, fov
-            center_x, center_y, center_z = 0.05, -0.52, self.CAM_Z
-            camera = Camera((center_x, center_y, center_z), (center_x, center_y, 0.785), 0.2, 2.0, (self.IMG_SIZE, self.IMG_SIZE), 40, [0, 1, 0])
-            env = Environment(camera, vis=vis, debug=debug, finger_length=0.06)
             generator = GraspGenerator(self.network_path, camera, self.depth_radius, self.fig, self.IMG_SIZE, self.network_model, device)
 
         objects.shuffle_objects()

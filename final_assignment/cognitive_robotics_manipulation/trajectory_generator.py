@@ -5,16 +5,14 @@ import jax
 import cv2
 import pybullet as p
 
+from environment.utilities import Camera
 from crossformer.model.crossformer_model import CrossFormerModel
-
-from trained_models.CrossFormer.crossformer_wrapper import CrossFormerWrapper
 
 
 class TrajectoryGenerator:
     def __init__(
         self,
         network_path,
-        camera,
         fig,
         img_size=224,
         device="cpu",
@@ -34,6 +32,17 @@ class TrajectoryGenerator:
 
         self.obs_buffer = []
         self.test_array = []
+
+        ## camera settings: cam_pos, cam_target, near, far, size, fov
+        # Top-down image
+        # center_x, center_y, center_z = 0.0, -0.325, 1.8
+        # camera = Camera((center_x, center_y, center_z), (center_x, center_y, 0.785), 0.1, 3.0, (self.IMG_SIZE, self.IMG_SIZE), 80, [0, 1, 0])
+
+        # center_x, center_y, center_z = 0.1, -0.7, 1.5
+        # camera = Camera((center_x, center_y, center_z), (0.1, -0.2, 1.1), 0.1, 3.0, (self.IMG_SIZE, self.IMG_SIZE), 90, [0, 1, 0])
+
+        center_x, center_y, center_z =  0.9, 0.0, 1.5
+        self.camera = Camera((center_x, center_y, center_z), (-0.5, 0.0, 0.0), 0.2, 2.0, (self.img_size, self.img_size), 90, [0, 0, 1])
 
 
     def add_image_to_buffer(self, rgb_img):
@@ -96,7 +105,7 @@ class TrajectoryGenerator:
         while step_count < self.max_steps:
             step_count += 1
 
-            bgr, depth, _ = env.camera.get_cam_img()
+            bgr, depth, _ = self.camera.get_cam_img()
             rgb = cv2.cvtColor(bgr, cv2.COLOR_BGR2RGB)
 
             #Debugging
