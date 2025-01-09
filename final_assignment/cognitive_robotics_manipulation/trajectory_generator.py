@@ -30,7 +30,7 @@ class TrajectoryGenerator:
         self.current_observation = 1
 
         model = CrossFormerModel.load_pretrained(network_path)
-        self.crossformer = CrossFormerWrapper(model, model.params, device=device)
+        self.crossformer = model
 
         self.obs_buffer = []
         self.test_array = []
@@ -91,7 +91,7 @@ class TrajectoryGenerator:
         step_count = 0
         print(obj_name)
 
-        self.task = self.crossformer.model.create_tasks(texts=[f"pick up the {obj_name}"])
+        self.task = self.crossformer.create_tasks(texts=[f"pick up the {obj_name}"])
 
         while step_count < self.max_steps:
             step_count += 1
@@ -108,11 +108,11 @@ class TrajectoryGenerator:
 
             observation = self.get_observations()
 
-            actions = self.crossformer.model.sample_actions(
+            actions = self.crossformer.sample_actions(
                 observation,
                 self.task,
                 head_name="single_arm",
-                unnormalization_statistics=self.crossformer.model.dataset_statistics["bridge_dataset"]["action"],
+                unnormalization_statistics=self.crossformer.dataset_statistics["bridge_dataset"]["action"],
                 rng=jax.random.PRNGKey(0)
             )
 
@@ -131,7 +131,7 @@ class TrajectoryGenerator:
                 f"grasp={grasp}"
             )
 
-            # if grasp >= 0.9:
+            # if grasp >= 0.01:
             #     print(f"[TrajectoryGenerator] Grasp triggered at step {step_count}.")
             #     env.auto_close_gripper(check_contact=True)
             #     break
