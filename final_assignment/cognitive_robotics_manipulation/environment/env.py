@@ -1,4 +1,5 @@
 from environment.utilities import setup_sisbot, Camera
+from airobot.utils.pb_util import BulletClient
 import math
 import time
 import numpy as np
@@ -38,7 +39,8 @@ class Environment:
         self.finger_length = finger_length
 
         # define environment
-        self.physicsClient = p.connect(p.GUI if self.vis else p.DIRECT)
+        # self.physicsClient = p.connect(p.GUI if self.vis else p.DIRECT)
+        self.physicsClient = BulletClient(connection_mode=p.GUI if self.vis else p.DIRECT)
         p.setAdditionalSearchPath(pybullet_data.getDataPath())
         p.setGravity(0, 0, -10)
         self.planeID = p.loadURDF('plane.urdf')

@@ -14,3 +14,5 @@ Pillow
 pandas
 pybullet
 attrdict
+airobot==0.1.0
+yacs

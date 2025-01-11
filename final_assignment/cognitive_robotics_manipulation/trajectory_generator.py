@@ -4,8 +4,10 @@ import jax
 
 import cv2
 import pybullet as p
+import torchvision.transforms as T
+from PIL import Image
 
-from environment.utilities import Camera
+from environment.utilities import Camera, MultiCams
 from crossformer.model.crossformer_model import CrossFormerModel
 
 
@@ -16,7 +18,7 @@ class TrajectoryGenerator:
         fig,
         img_size=224,
         device="cpu",
-        max_steps=300,
+        max_steps=500,
         window_size=5
     ):
         self.network_path = network_path
@@ -36,13 +38,17 @@ class TrajectoryGenerator:
         ## camera settings: cam_pos, cam_target, near, far, size, fov
         # Top-down image
         # center_x, center_y, center_z = 0.0, -0.325, 1.8
-        # camera = Camera((center_x, center_y, center_z), (center_x, center_y, 0.785), 0.1, 3.0, (self.IMG_SIZE, self.IMG_SIZE), 80, [0, 1, 0])
+        # self.camera = Camera((center_x, center_y, center_z), (center_x, center_y, 0.785), 0.1, 3.0, (self.img_size, self.img_size), 80, [0, 1, 0])
 
         # center_x, center_y, center_z = 0.1, -0.7, 1.5
         # camera = Camera((center_x, center_y, center_z), (0.1, -0.2, 1.1), 0.1, 3.0, (self.IMG_SIZE, self.IMG_SIZE), 90, [0, 1, 0])
 
-        center_x, center_y, center_z =  0.9, 0.0, 1.5
-        self.camera = Camera((center_x, center_y, center_z), (-0.5, 0.0, 0.0), 0.2, 2.0, (self.img_size, self.img_size), 90, [0, 0, 1])
+        # center_x, center_y, center_z =  0.9, 0.0, 1.5
+        # print(self.img_size)
+        # print((self.img_size, self.img_size))
+        # self.camera = Camera((center_x, center_y, center_z), (-0.5, 0.0, 0.0), 0.2, 2.0, (self.img_size, self.img_size), 90, [0, 0, 1])
+
+        # self.camera = MultiCams()
 
 
     def add_image_to_buffer(self, rgb_img):
@@ -96,20 +102,37 @@ class TrajectoryGenerator:
         return dx, dy, dz, dyaw, dpitch, droll, grasp
 
 
+    def render(self, env):
+        self.camera = MultiCams(env.physicsClient, n_cams=1)
+        rgb, _, _ = self.camera.cams[0].get_images(get_rgb=True, get_depth=True, get_seg=True)
+        rgb_image = Image.fromarray(rgb)
+        transform = T.Compose([
+            T.CenterCrop(480),
+            T.Resize(224)
+        ])
+
+        rgb_transformed = transform(rgb_image)
+
+        return np.asarray(rgb_transformed)
+
     def predict_trajectory(self, env, obj_name):
         step_count = 0
         print(obj_name)
 
-        self.task = self.crossformer.create_tasks(texts=[f"pick up the {obj_name}"])
+        _, ee_orn_0 = env.get_ee_pose()
+        ee_orn_0 = p.getQuaternionFromEuler(ee_orn_0)
+        env.move_ee([-0.15, -0.52, 1.3, ee_orn_0])
+        for _ in range(30):
+            p.stepSimulation()
+
+        self.task = self.crossformer.create_tasks(texts=[f"pick up the object on the white table"])
 
         while step_count < self.max_steps:
             step_count += 1
 
-            bgr, depth, _ = self.camera.get_cam_img()
-            rgb = cv2.cvtColor(bgr, cv2.COLOR_BGR2RGB)
-
-            #Debugging
-            cv2.imwrite("rgb_image.png", rgb)
+            rgb = self.render(env)
+            
+            Image.fromarray(rgb).save("rgb_image_image.png")
 
             self.add_image_to_buffer(rgb)
 
@@ -126,7 +149,7 @@ class TrajectoryGenerator:
             )
 
 
-            action = actions[0][0]
+            action = actions[0][4]
 
             dx, dy, dz, dyaw, dpitch, droll, grasp = self.parse_action(action)
 
@@ -140,24 +163,24 @@ class TrajectoryGenerator:
                 f"grasp={grasp}"
             )
 
-            # if grasp >= 0.01:
+            # if grasp <= 0.01:
             #     print(f"[TrajectoryGenerator] Grasp triggered at step {step_count}.")
             #     env.auto_close_gripper(check_contact=True)
             #     break
 
             ee_xyz, ee_rpy = env.get_ee_pose()
-            x_new = ee_xyz[0] + dx
+            x_new = ee_xyz[0] - dx 
             y_new = ee_xyz[1] + dy
-            z_new = ee_xyz[2] + dz
+            z_new = ee_xyz[2] + dz 
 
-            roll = ee_rpy[0] + droll
-            pitch = ee_rpy[1] + dpitch
-            yaw = ee_rpy[2] + dyaw
+            roll = ee_rpy[0] + droll 
+            pitch = ee_rpy[1] + dpitch 
+            yaw = ee_rpy[2] + dyaw 
             orn = p.getQuaternionFromEuler([roll, pitch, yaw])
 
             env.move_ee([x_new, y_new, z_new, orn], max_step=200)
 
-            for _ in range(1):
+            for _ in range(30):
                 p.stepSimulation()
                 time.sleep(env.SIMULATION_STEP_DELAY)
 

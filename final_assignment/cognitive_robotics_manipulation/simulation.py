@@ -19,11 +19,10 @@ class GrasppingScenarios():
     def __init__(self, network_model="GGCNN"):
         
         self.network_model = network_model
-        self.IMG_SIZE = 224
 
         if (network_model == "GR_ConvNet"):
             ##### GR-ConvNet #####
-            # self.IMG_SIZE = 224
+            self.IMG_SIZE = 224
             self.network_path = 'trained_models/GR_ConvNet/cornell-randsplit-rgbd-grconvnet3-drop1-ch32/epoch_19_iou_0.98'
             sys.path.append('trained_models/GR_ConvNet')
         elif (network_model == "GGCNN"):
@@ -33,7 +32,7 @@ class GrasppingScenarios():
             sys.path.append('trained_models/GGCNN')
         elif (network_model == "CrossFormer"):
             ##### CrossFormer #####
-            # self.IMG_SIZE = 224
+            self.IMG_SIZE = 224
             self.network_path = 'trained_models/CrossFormer/pretrained_model/crossformer'
             sys.path.append('trained_models/CrossFormer')
         else:
@@ -103,8 +102,9 @@ class GrasppingScenarios():
         env = Environment(camera, vis=vis, debug=debug, finger_length=0.06)
 
         if self.network_model == "CrossFormer":
-            generator = TrajectoryGenerator(self.network_path, camera, self.fig, self.IMG_SIZE, device)
-        else:    
+            print(self.IMG_SIZE)    
+            generator = TrajectoryGenerator(self.network_path, self.fig, self.IMG_SIZE, device)
+        else:
             generator = GraspGenerator(self.network_path, camera, self.depth_radius, self.fig, self.IMG_SIZE, self.network_model, device)
 
         objects.shuffle_objects()
@@ -119,7 +119,8 @@ class GrasppingScenarios():
 
 
                 env.reset_robot()          
-                env.remove_all_obj()                        
+                env.remove_all_obj()
+                obj_name = "TomatoSoupCan"                        
                
                 path, mod_orn, mod_stiffness = objects.get_obj_info(obj_name)
                 env.load_isolated_obj(path, mod_orn, mod_stiffness)
