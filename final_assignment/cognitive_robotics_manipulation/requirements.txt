@@ -5,8 +5,6 @@ scikit-image
 scikit-learn
 opencv-python
 imageio
-torch
-torchvision
 torchsummary
 tensorboardX
 pyrealsense2
@@ -14,5 +12,4 @@ Pillow
 pandas
 pybullet
 attrdict
-airobot==0.1.0
 yacs

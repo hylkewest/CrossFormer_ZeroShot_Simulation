@@ -22,7 +22,12 @@ class Environment:
     Z_TABLE_TOP = 0.785
     GRIP_REDUCTION = 0.60
 
-    def __init__(self, camera: Camera, vis=False, debug=False, gripper_type='140', finger_length=0.06) -> None:
+    def __init__(self, camera: Camera, vis=False, debug=False, gripper_type='140', finger_length=0.06, seed=None) -> None:
+        if seed is not None:
+            self.seed = seed
+            np.random.seed(seed)
+            random.seed(seed)
+            
         self.vis = vis
         self.debug = debug
         self.camera = camera
