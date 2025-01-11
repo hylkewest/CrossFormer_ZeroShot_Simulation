@@ -183,6 +183,8 @@ class TrajectoryGenerator:
         if self.make_video:
             video_frames= []
 
+        success = False
+        
         while step_count < self.max_steps:
             step_count += 1
 
@@ -195,7 +197,14 @@ class TrajectoryGenerator:
             #print(self.test_array)
 
             observation = self.get_observations()
+            if self.make_video:
+                video_frames.append(observation['image_primary'][0][-1])
 
+            # exit if success - do here to have all observations in video
+            if success:
+                print("[TrajectoryGenerator] successfully grasped the object. Exitting.")
+                break
+                
             actions = self.crossformer.sample_actions(
                 observation,
                 self.task,
@@ -205,7 +214,6 @@ class TrajectoryGenerator:
             )
             actions = actions[0]
 
-            success = False
             for j, action_vector in enumerate(actions): # action horizon 4
                 ee_xyz, ee_rpy = env.get_ee_pose() # current ee pose
                 target_xyz, target_quat = self.apply_delta_action(
@@ -217,9 +225,6 @@ class TrajectoryGenerator:
                     time.sleep(env.SIMULATION_STEP_DELAY)
 
                 print(f"Action {j+1}/{4} in step {step_count}/{self.max_steps}.\nTook delta action {action_vector}\n\n")
-                if self.make_video:
-                    observation = self.get_observations()
-                    video_frames.append(observation['image_primary'][0][-1])
 
                 # grasp if predicted
                 grasp_state = action_vector[-1]
@@ -230,18 +235,10 @@ class TrajectoryGenerator:
                         p.stepSimulation()
                         time.sleep(env.SIMULATION_STEP_DELAY)
 
-                    if self.make_video:
-                        observation = self.get_observations()
-                        video_frames.append(observation['image_primary'][0][-1])
-
                     # for now I hard-core True, you should use `env.check_grasped()` to check if object is indeed grasped.
                     success = True
                     break
 
-            if success:
-                print("[TrajectoryGenerator] successfully grasped the object Exitting.")
-                break
-                
         if step_count == self.max_steps:
             print("[TrajectoryGenerator] Reached max steps without grasp=1. Stopping.")
 
