@@ -218,6 +218,7 @@ class TrajectoryGenerator:
 
                 print(f"Action {j+1}/{4} in step {step_count}/{self.max_steps}.\nTook delta action {action_vector}\n\n")
                 if self.make_video:
+                    observation = self.get_observations()
                     video_frames.append(observation['image_primary'][0][-1])
 
                 # grasp if predicted
@@ -228,6 +229,10 @@ class TrajectoryGenerator:
                     for _ in range(10):
                         p.stepSimulation()
                         time.sleep(env.SIMULATION_STEP_DELAY)
+
+                    if self.make_video:
+                        observation = self.get_observations()
+                        video_frames.append(observation['image_primary'][0][-1])
 
                     # for now I hard-core True, you should use `env.check_grasped()` to check if object is indeed grasped.
                     success = True
