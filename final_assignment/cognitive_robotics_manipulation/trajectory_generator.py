@@ -233,16 +233,20 @@ class TrajectoryGenerator:
                     env.auto_close_gripper(check_contact=True)
                     for _ in range(10):
                         p.stepSimulation()
-                        time.sleep(env.SIMULATION_STEP_DELAY)
+                        time.sleep(0.1)
 
-                    # for now I hard-core True, you should use `env.check_grasped()` to check if object is indeed grasped.
-                    success = True
+                    success = env.check_grasped()
+                    if not success:
+                        # If the grasp is unsuccessful, open the grasper, so the policy continues trying.
+                        env.auto_open_gripper()
                     break
 
         if step_count == self.max_steps:
             print("[TrajectoryGenerator] Reached max steps without grasp=1. Stopping.")
 
         if self.make_video and success:
+            # add final grasp frame to video
+            video_frames.append(observation['image_primary'][0][-1])
             output_file = './temp_video.mp4'
             height, width, channels = video_frames[0].shape
             fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # 'mp4v' for .mp4 files
