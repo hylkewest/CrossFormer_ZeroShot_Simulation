@@ -1,4 +1,6 @@
 import time
+import csv
+import os
 import numpy as np
 import jax
 
@@ -19,13 +21,15 @@ class TrajectoryGenerator:
         img_size=224,
         max_steps=500,
         window_size=5,
-        make_video=False
+        make_video=False,
+        object_name=""
     ):
         self.img_size = img_size
         self.window_size = window_size
         self.max_steps = max_steps
         self.current_observation = 1
         self.camera_cfg = camera_cfg
+        self.object_name = object_name
 
         #model = CrossFormerModel.load_pretrained(network_path)
         self.crossformer = crossformer_model
@@ -171,7 +175,7 @@ class TrajectoryGenerator:
         
         return target_xyz, target_quat
 
-    def predict_trajectory(self, env):
+    def predict_trajectory(self, env, obj_id, obj_name):
         step_count = 0
 
         # _, ee_orn_0 = env.get_ee_pose()
@@ -184,17 +188,15 @@ class TrajectoryGenerator:
             video_frames= []
 
         success = False
+        gripper_close_count = 0
+        min_distance = 100000000
         
         while step_count < self.max_steps:
             step_count += 1
 
             rgb = self.render(env)
             
-            #Image.fromarray(rgb).save("rgb_image_image.png")
-
             self.add_image_to_buffer(rgb)
-
-            #print(self.test_array)
 
             observation = self.get_observations()
             if self.make_video:
@@ -225,17 +227,27 @@ class TrajectoryGenerator:
                     time.sleep(env.SIMULATION_STEP_DELAY)
 
                 print(f"Action {j+1}/{4} in step {step_count}/{self.max_steps}.\nTook delta action {action_vector}\n\n")
+                distance = env.calculate_distance_to_object(obj_id)
+
+                if distance < min_distance:
+                    print(f"New minimum distance found: {distance} compared to old distance {min_distance}")
+                    min_distance = distance
 
                 # grasp if predicted
                 grasp_state = action_vector[-1]
                 if grasp_state <= 0.01:
+                    
                     print(f"[TrajectoryGenerator] Grasp triggered at step {step_count}.")
+                    gripper_close_count+=1
                     env.auto_close_gripper(check_contact=True)
                     for _ in range(10):
                         p.stepSimulation()
                         time.sleep(0.1)
 
-                    success = env.check_grasped()
+                    # success = env.check_grasped()
+                    grasped_id = env.check_grasped_id()
+                    if len(grasped_id) == 1:
+                        success = True
                     if not success:
                         # If the grasp is unsuccessful, open the grasper, so the policy continues trying.
                         env.auto_open_gripper()
@@ -244,14 +256,33 @@ class TrajectoryGenerator:
         if step_count == self.max_steps:
             print("[TrajectoryGenerator] Reached max steps without grasp=1. Stopping.")
 
-        if self.make_video and success:
-            # add final grasp frame to video
-            video_frames.append(observation['image_primary'][0][-1])
-            output_file = './temp_video.mp4'
-            height, width, channels = video_frames[0].shape
-            fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # 'mp4v' for .mp4 files
-            out = cv2.VideoWriter(output_file, fourcc, 20, (width, height))
-            for frame in video_frames:
-                out.write(cv2.cvtColor(frame, cv2.COLOR_RGB2BGR))
-            out.release()
-            print(f'Video saved at {output_file}')
+        
+        self.save_experiment_stats(obj_name, step_count, gripper_close_count, success, min_distance)
+        # if self.make_video and success:
+        #     # add final grasp frame to video
+        #     video_frames.append(observation['image_primary'][0][-1])
+        #     output_file = './temp_video.mp4'
+        #     height, width, channels = video_frames[0].shape
+        #     fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # 'mp4v' for .mp4 files
+        #     out = cv2.VideoWriter(output_file, fourcc, 20, (width, height))
+        #     for frame in video_frames:
+        #         out.write(cv2.cvtColor(frame, cv2.COLOR_RGB2BGR))
+        #     out.release()
+        #     print(f'Video saved at {output_file}')
+
+    def save_experiment_stats(self, obj_name, step_count, gripper_close_count, success, min_distance):
+        file_path = "crossformer_results.csv"
+        file_exists = os.path.isfile(file_path)
+
+        # Open the file in append mode
+        with open(file_path, mode='a', newline='') as csv_file:
+            writer = csv.writer(csv_file)
+
+            # Write the header if the file is new
+            if not file_exists:
+                writer.writerow(["Object Name", "Step Count", "Gripper Close Count", "Success", "Smallest Distance"])
+
+            # Write the data
+            writer.writerow([obj_name, step_count, gripper_close_count, success, min_distance])
+
+        print(f"Experiment stats saved to {file_path}")

@@ -267,6 +267,15 @@ class Environment:
                                     
             self.step_simulation()
 
+    
+    def calculate_distance_to_object(self, obj_id):
+        gripper_position = p.getLinkState(self.robot_id, self.eef_id)[0]
+        object_position, _ = p.getBasePositionAndOrientation(obj_id)
+
+        distance = np.linalg.norm(np.array(gripper_position) - np.array(object_position))
+        return distance
+
+
     # def check_grasped(self):
     #     left_index = self.joints['left_inner_finger_pad_joint'].id
     #     right_index = self.joints['right_inner_finger_pad_joint'].id
@@ -482,6 +491,23 @@ class Environment:
             
         self.wait_until_still(obj_id)
         self.update_obj_states()
+
+    def load_isolated_obj_return_obj_id(self, path, mod_orn=False, mod_stiffness=False):
+        r_x = random.uniform(
+            self.obj_init_pos[0] - 0.1, self.obj_init_pos[0] + 0.1)
+        r_y = random.uniform(
+            self.obj_init_pos[1] - 0.1, self.obj_init_pos[1] + 0.1)
+        yaw = random.uniform(0, np.pi)
+
+        pos = [r_x, r_y, self.Z_TABLE_TOP]
+        obj_id, _, _ = self.load_obj(path, pos, yaw, mod_orn, mod_stiffness)
+        for _ in range(100):
+            self.step_simulation()
+            
+        self.wait_until_still(obj_id)
+        self.update_obj_states()    
+
+        return obj_id
 
     def create_temp_box(self, width, num):
         box_width = width
