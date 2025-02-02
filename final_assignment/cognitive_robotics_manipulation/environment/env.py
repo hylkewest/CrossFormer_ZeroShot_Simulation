@@ -1,4 +1,5 @@
 from environment.utilities import setup_sisbot, Camera
+from airobot.utils.pb_util import BulletClient
 import math
 import time
 import numpy as np
@@ -21,7 +22,12 @@ class Environment:
     Z_TABLE_TOP = 0.785
     GRIP_REDUCTION = 0.60
 
-    def __init__(self, camera: Camera, vis=False, debug=False, gripper_type='140', finger_length=0.06) -> None:
+    def __init__(self, camera: Camera, vis=False, debug=False, gripper_type='140', finger_length=0.06, seed=None) -> None:
+        if seed is not None:
+            self.seed = seed
+            np.random.seed(seed)
+            random.seed(seed)
+            
         self.vis = vis
         self.debug = debug
         self.camera = camera
@@ -38,7 +44,8 @@ class Environment:
         self.finger_length = finger_length
 
         # define environment
-        self.physicsClient = p.connect(p.GUI if self.vis else p.DIRECT)
+        # self.physicsClient = p.connect(p.GUI if self.vis else p.DIRECT)
+        self.physicsClient = BulletClient(connection_mode=p.GUI if self.vis else p.DIRECT)
         p.setAdditionalSearchPath(pybullet_data.getDataPath())
         p.setGravity(0, 0, -10)
         self.planeID = p.loadURDF('plane.urdf')
@@ -230,6 +237,24 @@ class Environment:
             self.controlGripper(controlMode=p.POSITION_CONTROL, targetPosition=0.085)
             self.step_simulation()
 
+    def get_robot_initial_pos(self):
+        user_parameters = (0, -1.5446774605904932, 1.54, -1.54,
+                           -1.5707970583733368, 0.0009377758247187636, 0.085)
+        for _ in range(60):
+            for i, name in enumerate(self.controlJoints):
+                
+                joint = self.joints[name]
+                # control robot joints
+                p.setJointMotorControl2(self.robot_id, joint.id, p.POSITION_CONTROL,
+                                        targetPosition=user_parameters[i], force=joint.maxForce,
+                                        maxVelocity=joint.maxVelocity)
+                self.step_simulation()
+                
+            self.controlGripper(controlMode=p.POSITION_CONTROL, targetPosition=0.085)
+            self.step_simulation()
+
+        return self.get_ee_pose()
+
 
 
     def move_arm_away(self):
@@ -242,18 +267,47 @@ class Environment:
                                     
             self.step_simulation()
 
+    
+    def calculate_distance_to_object(self, obj_id):
+        gripper_position = p.getLinkState(self.robot_id, self.eef_id)[0]
+        object_position, _ = p.getBasePositionAndOrientation(obj_id)
+
+        distance = np.linalg.norm(np.array(gripper_position) - np.array(object_position))
+        return distance
+
+
+    # def check_grasped(self):
+    #     left_index = self.joints['left_inner_finger_pad_joint'].id
+    #     right_index = self.joints['right_inner_finger_pad_joint'].id
+
+    #     contact_left = p.getContactPoints(
+    #         bodyA=self.robot_id, linkIndexA=left_index)
+    #     contact_right = p.getContactPoints(
+    #         bodyA=self.robot_id, linkIndexA=right_index)
+    #     contact_ids = set(item[2] for item in contact_left +
+    #                       contact_right if item[2] in [self.obj_id])
+    #     if len(contact_ids) == 1:
+    #         return True
+    #     return False
+
     def check_grasped(self):
         left_index = self.joints['left_inner_finger_pad_joint'].id
         right_index = self.joints['right_inner_finger_pad_joint'].id
 
-        contact_left = p.getContactPoints(
-            bodyA=self.robot_id, linkIndexA=left_index)
-        contact_right = p.getContactPoints(
-            bodyA=self.robot_id, linkIndexA=right_index)
-        contact_ids = set(item[2] for item in contact_left +
-                          contact_right if item[2] in [self.obj_id])
+        contact_left = p.getContactPoints(bodyA=self.robot_id, linkIndexA=left_index)
+        contact_right = p.getContactPoints(bodyA=self.robot_id, linkIndexA=right_index)
+
+        contact_ids = set(
+            item[2]
+            for item in contact_left + contact_right
+            if item[2] in self.obj_ids
+        )
+
         if len(contact_ids) == 1:
+            # You could also check if the object_id matches the expected ID. (for banana = 6)
+            # object_id = list(contact_ids)[0]
             return True
+        
         return False
 
     def check_grasped_id(self):
@@ -333,6 +387,22 @@ class Environment:
             # time.sleep(1 / 120)
             if check_contact and self.gripper_contact():
                 return True
+        return False
+    
+    def auto_open_gripper(self, step: int = 120) -> bool:
+        # Get initial gripper closed position
+        initial_position = p.getJointState(self.robot_id, self.joints[self.mimicParentName].id)[0]
+        initial_position = math.sin(0.715 - initial_position) * 0.1143 + 0.010
+
+        # Set the target fully open position (max open length)
+        max_open_length = 0.1143 + 0.010  # Assuming this is the max open length
+        for step_idx in range(1, step):
+            current_target_open_length = initial_position + step_idx / step * (max_open_length - initial_position)
+
+            self.move_gripper(current_target_open_length, 1)
+            if current_target_open_length >= max_open_length:
+                return True
+
         return False
 
     def calc_z_offset(self, gripper_opening_length: float):
@@ -421,6 +491,23 @@ class Environment:
             
         self.wait_until_still(obj_id)
         self.update_obj_states()
+
+    def load_isolated_obj_return_obj_id(self, path, mod_orn=False, mod_stiffness=False):
+        r_x = random.uniform(
+            self.obj_init_pos[0] - 0.1, self.obj_init_pos[0] + 0.1)
+        r_y = random.uniform(
+            self.obj_init_pos[1] - 0.1, self.obj_init_pos[1] + 0.1)
+        yaw = random.uniform(0, np.pi)
+
+        pos = [r_x, r_y, self.Z_TABLE_TOP]
+        obj_id, _, _ = self.load_obj(path, pos, yaw, mod_orn, mod_stiffness)
+        for _ in range(100):
+            self.step_simulation()
+            
+        self.wait_until_still(obj_id)
+        self.update_obj_states()    
+
+        return obj_id
 
     def create_temp_box(self, width, num):
         box_width = width
@@ -600,6 +687,14 @@ class Environment:
         if self.debug:
             print('Failed to reach the target')
         return False, p.getLinkState(self.robot_id, self.eef_id)[0:2]
+    
+    def get_ee_pose(self):
+        real_xyz, real_xyzw = p.getLinkState(
+            self.robot_id, self.eef_id
+        )[0:2]
+        real_euler = p.getEulerFromQuaternion(real_xyzw)
+        return real_xyz, real_euler
+                    
 
     def grasp(self, pos: tuple, roll: float, gripper_opening_length: float, obj_height: float, debug: bool = False):
         """

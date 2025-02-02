@@ -1,4 +1,5 @@
 from grasp_generator import GraspGenerator
+from trajectory_generator import TrajectoryGenerator
 from environment.utilities import Camera
 from environment.env import Environment
 from utils import YcbObjects, PackPileData, IsolatedObjData, summarize
@@ -29,10 +30,11 @@ class GrasppingScenarios():
             self.IMG_SIZE = 300
             self.network_path = 'trained_models/GGCNN/ggcnn_weights_cornell/ggcnn_epoch_23_cornell'
             sys.path.append('trained_models/GGCNN')
-        elif (network_model == "crossformer"):
-            ##### Crossformer #####
-            self.network_path = 'trained_models/crossformer/300000/default/checkpoint'
-            sys.path.append('trained_models/crossformer')
+        elif (network_model == "CrossFormer"):
+            ##### CrossFormer #####
+            self.IMG_SIZE = 224
+            self.network_path = 'trained_models/CrossFormer/pretrained_model/crossformer'
+            sys.path.append('trained_models/CrossFormer')
         else:
             print("The selected network has not been implemented yet!")
             exit() 
@@ -96,25 +98,37 @@ class GrasppingScenarios():
 
         ## camera settings: cam_pos, cam_target, near, far, size, fov
         center_x, center_y, center_z = 0.05, -0.52, self.CAM_Z
-        camera = Camera((center_x, center_y, center_z), (center_x, center_y, 0.785), 0.2, 2.0, (self.IMG_SIZE, self.IMG_SIZE), 40)
+        camera = Camera((center_x, center_y, center_z), (center_x, center_y, 0.785), 0.2, 2.0, (self.IMG_SIZE, self.IMG_SIZE), 40, [0, 1, 0])
         env = Environment(camera, vis=vis, debug=debug, finger_length=0.06)
-        
-        generator = GraspGenerator(self.network_path, camera, self.depth_radius, self.fig, self.IMG_SIZE, self.network_model, device)
-        
+
+        if self.network_model == "CrossFormer":
+            print(self.IMG_SIZE)    
+            generator = TrajectoryGenerator(self.network_path, self.fig, self.IMG_SIZE, device)
+        else:
+            generator = GraspGenerator(self.network_path, camera, self.depth_radius, self.fig, self.IMG_SIZE, self.network_model, device)
+
         objects.shuffle_objects()
         for i in range(runs):
             print("----------- run ", i+1, " -----------")
             print ("network model = ", self.network_model)
             print ("size of input image (W, H) = (", self.IMG_SIZE," ," ,self.IMG_SIZE, ")")
 
+
             for obj_name in objects.obj_names:
                 print(obj_name)
 
+
                 env.reset_robot()          
-                env.remove_all_obj()                        
+                env.remove_all_obj()
+                obj_name = "TomatoSoupCan"                        
                
                 path, mod_orn, mod_stiffness = objects.get_obj_info(obj_name)
                 env.load_isolated_obj(path, mod_orn, mod_stiffness)
+
+                if self.network_model == "CrossFormer":
+                    generator.predict_trajectory(env, obj_name)
+                    return
+
                 self.dummy_simulation_steps(20)
 
                 number_of_attempts = self.ATTEMPTS
@@ -127,8 +141,8 @@ class GrasppingScenarios():
 
                     ##convert BGR to RGB
                     rgb = cv2.cvtColor(bgr, cv2.COLOR_BGR2RGB)
-                              
-                    grasps, save_name = generator.predict_grasp( rgb, depth, n_grasps=number_of_attempts, show_output=output)
+                    
+                    grasps, save_name = generator.predict_grasp(rgb, depth, n_grasps=number_of_attempts, show_output=output)
                     if (grasps == []):
                         self.dummy_simulation_steps(50)
                         #print ("could not find a grasp point!")
@@ -222,9 +236,16 @@ class GrasppingScenarios():
             data = PackPileData(number_of_objects, runs, 'results', 'pile')
 
 
-        center_x, center_y, center_z = 0.05, -0.52, self.CAM_Z
-        camera = Camera((center_x, center_y, center_z), (center_x, center_y, 0.785), 0.2, 2.0, (self.IMG_SIZE, self.IMG_SIZE), 40)
-        env = Environment(camera, vis=vis, debug=debug, finger_length=0.06)
+        if self.network_model == "CrossFormer":
+            ## camera settings: cam_pos, cam_target, near, far, size, fov
+            center_x, center_y, center_z = 0.0, -0.325, self.CAM_Z
+            camera = Camera((center_x, center_y, center_z), (center_x, center_y, 0.785), 0.1, 3.0, (self.IMG_SIZE, self.IMG_SIZE), 90)
+            env = Environment(camera, vis=vis, debug=debug, finger_length=0.06)
+        else:    
+            ## camera settings: cam_pos, cam_target, near, far, size, fov
+            center_x, center_y, center_z = 0.05, -0.52, self.CAM_Z
+            camera = Camera((center_x, center_y, center_z), (center_x, center_y, 0.785), 0.2, 2.0, (self.IMG_SIZE, self.IMG_SIZE), 40)
+            env = Environment(camera, vis=vis, debug=debug, finger_length=0.06)
         
         generator = GraspGenerator(self.network_path, camera, self.depth_radius, self.fig, self.IMG_SIZE, self.network_model, device)
 

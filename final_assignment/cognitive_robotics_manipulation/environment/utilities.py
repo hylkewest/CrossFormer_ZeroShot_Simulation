@@ -2,8 +2,11 @@ import pybullet as p
 from collections import namedtuple
 from attrdict import AttrDict
 import functools
+import numpy as np
 import os
 from datetime import datetime
+from yacs.config import CfgNode as CN
+from airobot.sensor.camera.rgbdcam_pybullet import RGBDCameraPybullet
 
 
 def setup_sisbot(p, robotID, gripper_type):
@@ -171,17 +174,18 @@ def setup_sisbot_force(p, robotID, gripper_type):
 
 
 class Camera:
-    def __init__(self, cam_pos, cam_target, near, far, size, fov):
+    def __init__(self, cam_pos, cam_target, near, far, size, fov, orientation):
         self.x, self.y, self.z = cam_pos
         self.x_t, self.y_t, self.z_t = cam_target
         self.width, self.height = size
         self.near, self.far = near, far
         self.fov = fov
+        self.orientation = orientation
 
         aspect = self.width / self.height
         self.projection_matrix = p.computeProjectionMatrixFOV(
             fov, aspect, near, far)
-        self.view_matrix = p.computeViewMatrix(cam_pos, cam_target, [0, 1, 0])
+        self.view_matrix = p.computeViewMatrix(cam_pos, cam_target, self.orientation)
 
         self.rec_id = None
 
@@ -211,3 +215,59 @@ class Camera:
     def stop_recording(self):
         p.stopStateLogging(self.rec_id)
         p.configureDebugVisualizer(p.COV_ENABLE_GUI, 1)
+
+def get_default_multicams_cfg():
+    _C1 = CN()
+    _C1.FOCUS_PT = [0.0, -0.52, 0.785]
+    _C1.YAW_ANGLES = [200, 45, -45, 135]
+    _C1.DISTANCES = [0.85, 0.8, 0.8, 0.8]
+    _C1.PITCH_ANGLES = [-35, -25, -25, -25]
+    return _C1.clone()
+
+def get_default_cam_params():
+    _C = CN()
+    _C.ZNEAR = 0.025
+    _C.ZFAR = 10
+    _C.WIDTH = 640
+    _C.HEIGHT = 480
+    _C.FOV = 70
+    _ROOT_C = CN()
+    _ROOT_C.CAM = CN()
+    _ROOT_C.CAM.SIM = _C
+    return _ROOT_C.clone()
+
+class MultiCams:
+    """
+    Class for easily obtaining simulated camera image observations in pybullet
+    """
+    def __init__(self, pb_client, n_cams=2, cfg=None, cam_params=None):
+        #super(MultiCams, self).__init__()
+        self.pb_client = pb_client
+        if cam_params is None:
+            cam_params = get_default_cam_params()
+        if cfg is None:
+            cfg = get_default_multicams_cfg()
+        self.cfg = cfg
+        self.cam_params = cam_params
+        self.n_cams = n_cams
+        self.cams = []
+        for _ in range(n_cams):
+            self.cams.append(RGBDCameraPybullet(cfgs=cam_params,
+                                                pb_client=pb_client))
+
+        self.cam_setup_cfg = {}
+        self.cam_setup_cfg['focus_pt'] = [self.cfg.FOCUS_PT] * self.n_cams
+        self.cam_setup_cfg['dist'] = self.cfg.DISTANCES[:self.n_cams]
+        self.cam_setup_cfg['yaw'] = self.cfg.YAW_ANGLES[:self.n_cams]
+        self.cam_setup_cfg['pitch'] = self.cfg.PITCH_ANGLES[:self.n_cams]
+        self.cam_setup_cfg['roll'] = [0] * self.n_cams
+
+        # set up multiple pybullet cameras in the simulated environment
+        for i, cam in enumerate(self.cams):
+            cam.setup_camera(
+                focus_pt=self.cam_setup_cfg['focus_pt'][i],
+                dist=self.cam_setup_cfg['dist'][i],
+                yaw=self.cam_setup_cfg['yaw'][i],
+                pitch=self.cam_setup_cfg['pitch'][i],
+                roll=self.cam_setup_cfg['roll'][i]
+            )
