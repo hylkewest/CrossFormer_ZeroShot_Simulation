@@ -219,9 +219,9 @@ class Camera:
 def get_default_multicams_cfg():
     _C1 = CN()
     _C1.FOCUS_PT = [0.0, -0.52, 0.785]
-    _C1.YAW_ANGLES = [225, 45, -45, 135]
-    _C1.DISTANCES = [1.4, 0.8, 0.8, 0.8]
-    _C1.PITCH_ANGLES = [-45, -25, -25, -25]
+    _C1.YAW_ANGLES = [200, 45, -45, 135]
+    _C1.DISTANCES = [0.85, 0.8, 0.8, 0.8]
+    _C1.PITCH_ANGLES = [-35, -25, -25, -25]
     return _C1.clone()
 
 def get_default_cam_params():

@@ -81,9 +81,6 @@ class GraspGenerator:
         # Get x, y, z of center pixel
         x_p, y_p = grasp.center[0], grasp.center[1]
 
-        print("x_p: ", x_p)
-        print("x_p: ", y_p)
-
         # Get area of depth values around center pixel
         x_min = int(np.clip(x_p - self.depth_r, 0, self.IMG_WIDTH))
         x_max = int(np.clip(x_p + self.depth_r, 0, self.IMG_WIDTH))
